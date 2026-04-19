@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pok&eacute;mon Card Collection Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 30px 20px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 32px;
+    margin-bottom: 4px;
+    color: #fff;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 36px;
+  }
+
+  .total-section {
+    max-width: 700px;
+    margin: 0 auto 40px;
+    background: #16213e;
+    border-radius: 14px;
+    padding: 24px 30px;
+    border: 1px solid #333;
+  }
+
+  .total-section h2 {
+    font-size: 18px;
+    color: #aaa;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .total-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .stat-block {
+    text-align: center;
+    flex: 1;
+    min-width: 100px;
+  }
+
+  .stat-number {
+    font-size: 42px;
+    font-weight: bold;
+    line-height: 1.1;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .progress-bar-wrap {
+    margin-top: 18px;
+    background: #0d1b36;
+    border-radius: 8px;
+    height: 14px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width .4s ease;
+  }
+
+  .progress-pct {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    margin-top: 6px;
+  }
+
+  .lists-grid {
+    max-width: 700px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .list-card {
+    background: #16213e;
+    border: 1px solid #333;
+    border-radius: 14px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .15s, box-shadow .2s;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .list-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.4);
+  }
+
+  .list-card h3 {
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .list-card .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .ogerpon-accent { color: #7ec8e3; }
+  .ogerpon-accent .icon { background: #7ec8e322; color: #7ec8e3; }
+
+  .wishlist-accent { color: #e8a0e8; }
+  .wishlist-accent .icon { background: #e8a0e822; color: #e8a0e8; }
+
+  .list-meta {
+    font-size: 13px;
+    color: #888;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+
+  .list-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .list-stat-num {
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .list-progress-wrap {
+    flex: 1;
+    margin-left: 20px;
+  }
+
+  .list-progress-bar {
+    background: #0d1b36;
+    border-radius: 6px;
+    height: 10px;
+    overflow: hidden;
+  }
+
+  .list-progress-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width .4s ease;
+  }
+
+  .list-progress-pct {
+    text-align: right;
+    font-size: 12px;
+    color: #888;
+    margin-top: 3px;
+  }
+
+  .list-link {
+    display: inline-block;
+    margin-top: auto;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    transition: opacity .15s;
+  }
+
+  .list-link:hover { opacity: .85; }
+
+  .ogerpon-accent .list-link { background: #7ec8e3; color: #0d1b36; }
+  .wishlist-accent .list-link { background: #e8a0e8; color: #1a1a2e; }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 10px; }
+    h1 { color: #000; }
+    .subtitle { color: #555; }
+    .total-section, .list-card { background: #fff; border: 1.5px solid #000; }
+    .total-section h2 { color: #333; }
+    .stat-number { color: #000; }
+    .stat-label, .list-meta, .progress-pct, .list-progress-pct { color: #555; }
+    .progress-bar-wrap, .list-progress-bar { background: #ddd; }
+    .progress-bar-fill, .list-progress-fill {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .list-link {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .list-card:hover { transform: none; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Pok&eacute;mon Card Collection</h1>
+<p class="subtitle" id="date-str"></p>
+
+<div class="total-section">
+  <h2>Overall Progress</h2>
+  <div class="total-stats">
+    <div class="stat-block">
+      <div class="stat-number" id="total-owned" style="color:#4caf50">0</div>
+      <div class="stat-label">Cards Owned</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-number" id="total-cards" style="color:#7ec8e3">0</div>
+      <div class="stat-label">Total Cards</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-number" id="total-missing" style="color:#ef5350">0</div>
+      <div class="stat-label">Still Missing</div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="total-bar" style="width:0;background:linear-gradient(90deg,#4caf50,#7ec8e3)"></div>
+  </div>
+  <div class="progress-pct" id="total-pct">0%</div>
+</div>
+
+<div class="lists-grid">
+  <div class="list-card ogerpon-accent">
+    <h3><span class="icon">&#127811;</span> Ogerpon Collection</h3>
+    <div class="list-meta">
+      <span>29 cards</span>
+      <span>4 sets + promos</span>
+      <span>#1017 Ogerpon</span>
+    </div>
+    <div class="list-stats">
+      <div>
+        <div class="list-stat-num" id="ogerpon-owned" style="color:#7ec8e3">0</div>
+        <div class="stat-label">owned of 29</div>
+      </div>
+      <div class="list-progress-wrap">
+        <div class="list-progress-bar">
+          <div class="list-progress-fill" id="ogerpon-bar" style="width:0;background:#7ec8e3"></div>
+        </div>
+        <div class="list-progress-pct" id="ogerpon-pct">0%</div>
+      </div>
+    </div>
+    <a class="list-link" href="ogerpon-cards.html">Open Ogerpon Checklist &rarr;</a>
+  </div>
+
+  <div class="list-card wishlist-accent">
+    <h3><span class="icon">&#11088;</span> Wishlist</h3>
+    <div class="list-meta">
+      <span>12 cards</span>
+      <span>7 sets</span>
+      <span>Mixed Pok&eacute;mon &amp; Trainers</span>
+    </div>
+    <div class="list-stats">
+      <div>
+        <div class="list-stat-num" id="wishlist-owned" style="color:#e8a0e8">0</div>
+        <div class="stat-label">owned of 12</div>
+      </div>
+      <div class="list-progress-wrap">
+        <div class="list-progress-bar">
+          <div class="list-progress-fill" id="wishlist-bar" style="width:0;background:#e8a0e8"></div>
+        </div>
+        <div class="list-progress-pct" id="wishlist-pct">0%</div>
+      </div>
+    </div>
+    <a class="list-link" href="wishlist.html">Open Wishlist &rarr;</a>
+  </div>
+</div>
+
+<script>
+const OGERPON_TOTAL = 29;
+const WISHLIST_TOTAL = 48;
+
+function countOwned(key) {
+  try {
+    const map = JSON.parse(localStorage.getItem(key) || "{}");
+    return Object.values(map).filter(Boolean).length;
+  } catch { return 0; }
+}
+
+function update() {
+  const og = countOwned("ogerpon-owned");
+  const wl = countOwned("wishlist-owned");
+  const totalOwned = og + wl;
+  const totalCards = OGERPON_TOTAL + WISHLIST_TOTAL;
+  const totalMissing = totalCards - totalOwned;
+
+  document.getElementById("total-owned").textContent = totalOwned;
+  document.getElementById("total-cards").textContent = totalCards;
+  document.getElementById("total-missing").textContent = totalMissing;
+
+  const totalPct = totalCards ? Math.round((totalOwned / totalCards) * 100) : 0;
+  document.getElementById("total-bar").style.width = totalPct + "%";
+  document.getElementById("total-pct").textContent = totalPct + "% complete";
+
+  document.getElementById("ogerpon-owned").textContent = og;
+  const ogPct = OGERPON_TOTAL ? Math.round((og / OGERPON_TOTAL) * 100) : 0;
+  document.getElementById("ogerpon-bar").style.width = ogPct + "%";
+  document.getElementById("ogerpon-pct").textContent = ogPct + "%";
+
+  document.getElementById("wishlist-owned").textContent = wl;
+  const wlPct = WISHLIST_TOTAL ? Math.round((wl / WISHLIST_TOTAL) * 100) : 0;
+  document.getElementById("wishlist-bar").style.width = wlPct + "%";
+  document.getElementById("wishlist-pct").textContent = wlPct + "%";
+}
+
+document.getElementById("date-str").textContent = "Last updated: " +
+  new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+update();
+window.addEventListener("focus", update);
+</script>
+</body>
+</html>

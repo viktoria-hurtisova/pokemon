@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ogerpon Card Checklist</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #7ec8e3;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 6px;
+    color: #7ec8e3;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .stats-bar {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: #aaa;
+  }
+
+  .stats-bar span {
+    font-weight: bold;
+    color: #7ec8e3;
+  }
+
+  .set-group {
+    margin-bottom: 30px;
+  }
+
+  .set-header {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f0c040;
+    border-bottom: 2px solid #f0c04055;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: #16213e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .2s;
+    position: relative;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .card:hover { box-shadow: 0 0 12px rgba(126,200,227,.35); }
+
+  .card.owned { border-color: #4caf50; }
+  .card.owned .owned-badge { display: block; }
+
+  .owned-badge {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #4caf50;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+
+  .card-img-wrap {
+    background: #0d1b36;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 10px;
+  }
+
+  .card-img-wrap img {
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: 6px;
+  }
+
+  .card-info {
+    padding: 10px 12px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .card-meta {
+    font-size: 12px;
+    color: #aaa;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+
+  .card-meta b { color: #ccc; }
+
+  .rarity-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .rarity-holo       { background: #5c6bc0; }
+  .rarity-double      { background: #7b1fa2; }
+  .rarity-ir          { background: #00838f; }
+  .rarity-sar         { background: #e65100; }
+  .rarity-hr          { background: #bf360c; }
+  .rarity-uncommon    { background: #558b2f; }
+  .rarity-promo       { background: #6d4c41; }
+
+  .type-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .type-grass     { background: #4caf50; }
+  .type-fire      { background: #f44336; }
+  .type-water     { background: #2196f3; }
+  .type-fighting  { background: #a1887f; }
+
+  .checkbox-row {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid #ffffff15;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .checkbox-row label {
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    color: #bbb;
+  }
+
+  .checkbox-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #4caf50;
+  }
+
+  /* ---------- PRINT STYLES ---------- */
+  @media print {
+    body {
+      background: #fff;
+      color: #000;
+      padding: 0;
+      font-size: 11px;
+    }
+
+    .back-link { display: none; }
+    h1 { color: #000; font-size: 22px; }
+    .subtitle { color: #555; }
+    .stats-bar { display: none; }
+
+    .set-header {
+      color: #000;
+      border-color: #000;
+      font-size: 16px;
+    }
+
+    .card-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1.5px solid #000;
+      border-radius: 6px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .card:hover { box-shadow: none; }
+    .card.owned { display: none !important; }
+
+    .card-img-wrap {
+      background: #f5f5f5;
+      min-height: 120px;
+      padding: 6px;
+    }
+
+    .card-img-wrap img {
+      max-height: 170px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .card-info { padding: 6px 8px 8px; }
+    .card-name { color: #000; font-size: 12px; }
+    .card-meta { color: #333; font-size: 10px; }
+    .card-meta b { color: #000; }
+
+    .rarity-badge, .type-badge {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .owned-badge {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #000;
+      border-radius: 2px;
+      background: #fff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .checkbox-row label { color: #000; font-size: 11px; }
+
+    .set-group { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">&larr; Back to Dashboard</a>
+<h1>Ogerpon TCG Card Checklist</h1>
+<p class="subtitle">#1017 &mdash; All known Ogerpon cards &mdash; <span id="date-str"></span></p>
+<div class="stats-bar">Collected: <span id="count-owned">0</span> / <span id="count-total">0</span></div>
+
+<div id="card-list"></div>
+
+<script>
+const CARDS = [
+  // ---- Twilight Masquerade ----
+  {
+    name: "Teal Mask Ogerpon",
+    number: "024",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Holo Rare",
+    rarityClass: "holo",
+    type: "Grass",
+    hp: 110,
+    weakness: "Fire",
+    retreat: 1
+  },
+  {
+    name: "Teal Mask Ogerpon ex",
+    number: "025",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Double Rare",
+    rarityClass: "double",
+    type: "Grass",
+    hp: 210,
+    weakness: "Fire",
+    retreat: 1
+  },
+  {
+    name: "Hearthflame Mask Ogerpon ex",
+    number: "040",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Double Rare",
+    rarityClass: "double",
+    type: "Fire",
+    hp: 210,
+    weakness: "Water",
+    retreat: 1
+  },
+  {
+    name: "Wellspring Mask Ogerpon ex",
+    number: "064",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Double Rare",
+    rarityClass: "double",
+    type: "Water",
+    hp: 210,
+    weakness: "Electric",
+    retreat: 1
+  },
+  {
+    name: "Cornerstone Mask Ogerpon ex",
+    number: "112",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Double Rare",
+    rarityClass: "double",
+    type: "Fighting",
+    hp: 210,
+    weakness: "Grass",
+    retreat: 1
+  },
+  {
+    name: "Teal Mask Ogerpon ex",
+    number: "190",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Illustration Rare",
+    rarityClass: "ir",
+    type: "Grass",
+    hp: 210,
+    weakness: "Fire",
+    retreat: 1
+  },
+  {
+    name: "Hearthflame Mask Ogerpon ex",
+    number: "192",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Illustration Rare",
+    rarityClass: "ir",
+    type: "Fire",
+    hp: 210,
+    weakness: "Water",
+    retreat: 1
+  },
+  {
+    name: "Wellspring Mask Ogerpon ex",
+    number: "194",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Illustration Rare",
+    rarityClass: "ir",
+    type: "Water",
+    hp: 210,
+    weakness: "Electric",
+    retreat: 1
+  },
+  {
+    name: "Cornerstone Mask Ogerpon ex",
+    number: "199",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Illustration Rare",
+    rarityClass: "ir",
+    type: "Fighting",
+    hp: 210,
+    weakness: "Grass",
+    retreat: 1
+  },
+  {
+    name: "Teal Mask Ogerpon ex",
+    number: "211",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Grass",
+    hp: 210,
+    weakness: "Fire",
+    retreat: 1
+  },
+  {
+    name: "Hearthflame Mask Ogerpon ex",
+    number: "212",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Fire",
+    hp: 210,
+    weakness: "Water",
+    retreat: 1
+  },
+  {
+    name: "Wellspring Mask Ogerpon ex",
+    number: "213",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Water",
+    hp: 210,
+    weakness: "Electric",
+    retreat: 1
+  },
+  {
+    name: "Cornerstone Mask Ogerpon ex",
+    number: "215",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Fighting",
+    hp: 210,
+    weakness: "Grass",
+    retreat: 1
+  },
+  {
+    name: "Teal Mask Ogerpon ex",
+    number: "221",
+    setTotal: "167",
+    set: "Twilight Masquerade",
+    setSlug: "twilightmasquerade",
+    rarity: "Hyper Rare",
+    rarityClass: "hr",
+    type: "Grass",
+    hp: 210,
+    weakness: "Fire",
+    retreat: 1
+  },
+  // ---- Prismatic Evolutions ----
+  {
+    name: "Teal Mask Ogerpon ex",
+    number: "012",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Double Rare",
+    rarityClass: "double",
+    type: "Grass",
+    hp: 210,
+    weakness: "Fire",
+    retreat: 1
+  },
+  {
+    name: "Hearthflame Mask Ogerpon ex",
+    number: "017",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Double Rare",
+    rarityClass: "double",
+    type: "Fire",
+    hp: 210,
+    weakness: "Water",
+    retreat: 1
+  },
+  {
+    name: "Wellspring Mask Ogerpon ex",
+    number: "027",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Double Rare",
+    rarityClass: "double",
+    type: "Water",
+    hp: 210,
+    weakness: "Electric",
+    retreat: 1
+  },
+  {
+    name: "Cornerstone Mask Ogerpon ex",
+    number: "058",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Double Rare",
+    rarityClass: "double",
+    type: "Fighting",
+    hp: 210,
+    weakness: "Grass",
+    retreat: 1
+  },
+  {
+    name: "Teal Mask Ogerpon ex",
+    number: "145",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Grass",
+    hp: 210,
+    weakness: "Fire",
+    retreat: 1
+  },
+  {
+    name: "Hearthflame Mask Ogerpon ex",
+    number: "148",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Fire",
+    hp: 210,
+    weakness: "Water",
+    retreat: 1
+  },
+  {
+    name: "Wellspring Mask Ogerpon ex",
+    number: "152",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Water",
+    hp: 210,
+    weakness: "Electric",
+    retreat: 1
+  },
+  {
+    name: "Cornerstone Mask Ogerpon ex",
+    number: "160",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Fighting",
+    hp: 210,
+    weakness: "Grass",
+    retreat: 1
+  },
+  {
+    name: "Teal Mask Ogerpon ex",
+    number: "177",
+    setTotal: "131",
+    set: "Prismatic Evolutions",
+    setSlug: "prismaticevolutions",
+    rarity: "Hyper Rare",
+    rarityClass: "hr",
+    type: "Grass",
+    hp: 210,
+    weakness: "Fire",
+    retreat: 1
+  },
+  // ---- Destined Rivals ----
+  {
+    name: "Teal Mask Ogerpon",
+    number: "026",
+    setTotal: "182",
+    set: "Destined Rivals",
+    setSlug: "destinedrivals",
+    rarity: "Uncommon",
+    rarityClass: "uncommon",
+    type: "Grass",
+    hp: 110,
+    weakness: "Fire",
+    retreat: 1
+  },
+  {
+    name: "Hearthflame Mask Ogerpon",
+    number: "044",
+    setTotal: "182",
+    set: "Destined Rivals",
+    setSlug: "destinedrivals",
+    rarity: "Uncommon",
+    rarityClass: "uncommon",
+    type: "Fire",
+    hp: 110,
+    weakness: "Water",
+    retreat: 1
+  },
+  {
+    name: "Wellspring Mask Ogerpon",
+    number: "067",
+    setTotal: "182",
+    set: "Destined Rivals",
+    setSlug: "destinedrivals",
+    rarity: "Uncommon",
+    rarityClass: "uncommon",
+    type: "Water",
+    hp: 110,
+    weakness: "Electric",
+    retreat: 1
+  },
+  {
+    name: "Cornerstone Mask Ogerpon",
+    number: "111",
+    setTotal: "182",
+    set: "Destined Rivals",
+    setSlug: "destinedrivals",
+    rarity: "Uncommon",
+    rarityClass: "uncommon",
+    type: "Fighting",
+    hp: 110,
+    weakness: "Grass",
+    retreat: 1
+  },
+  // ---- SV Promos ----
+  {
+    name: "Teal Mask Ogerpon",
+    number: "123",
+    setTotal: null,
+    set: "SV Promos",
+    setSlug: "svpromos",
+    rarity: "Promo",
+    rarityClass: "promo",
+    type: "Grass",
+    hp: 110,
+    weakness: "Fire",
+    retreat: 1
+  },
+  {
+    name: "Teal Mask Ogerpon ex",
+    number: "166",
+    setTotal: null,
+    set: "SV Promos",
+    setSlug: "svpromos",
+    rarity: "Promo",
+    rarityClass: "promo",
+    type: "Grass",
+    hp: 210,
+    weakness: "Fire",
+    retreat: 1
+  }
+];
+
+function getImgUrl(c) {
+  const num = parseInt(c.number, 10);
+  return `https://www.serebii.net/card/${c.setSlug}/${num}.jpg`;
+}
+
+function cardId(c, i) {
+  return `${c.setSlug}-${c.number}`;
+}
+
+function loadOwned() {
+  try {
+    return JSON.parse(localStorage.getItem("ogerpon-owned") || "{}");
+  } catch { return {}; }
+}
+
+function saveOwned(map) {
+  localStorage.setItem("ogerpon-owned", JSON.stringify(map));
+}
+
+function updateCount() {
+  const owned = loadOwned();
+  const total = CARDS.length;
+  const count = Object.values(owned).filter(Boolean).length;
+  document.getElementById("count-owned").textContent = count;
+  document.getElementById("count-total").textContent = total;
+}
+
+function render() {
+  const owned = loadOwned();
+  const container = document.getElementById("card-list");
+
+  const grouped = {};
+  CARDS.forEach((c, i) => {
+    if (!grouped[c.set]) grouped[c.set] = [];
+    grouped[c.set].push({ ...c, _i: i });
+  });
+
+  let html = "";
+  for (const [setName, cards] of Object.entries(grouped)) {
+    html += `<div class="set-group">`;
+    html += `<div class="set-header">${setName}</div>`;
+    html += `<div class="card-grid">`;
+    for (const c of cards) {
+      const cid = cardId(c, c._i);
+      const isOwned = !!owned[cid];
+      const numberStr = c.setTotal ? `${c.number} / ${c.setTotal}` : `#${c.number}`;
+      html += `
+        <div class="card ${isOwned ? "owned" : ""}" id="card-${cid}">
+          <div class="owned-badge">OWNED</div>
+          <div class="card-img-wrap">
+            <img src="${getImgUrl(c)}" alt="${c.name}" loading="lazy"
+                 onerror="this.onerror=null;this.alt='Image not available';">
+          </div>
+          <div class="card-info">
+            <div class="card-name">${c.name}</div>
+            <div class="card-meta">
+              <span><b>Set:</b> ${c.set}</span>
+              <span><b>#</b> ${numberStr}</span>
+              <span><b>HP:</b> ${c.hp}</span>
+            </div>
+            <div class="card-meta">
+              <span class="type-badge type-${c.type.toLowerCase()}">${c.type}</span>
+              <span class="rarity-badge rarity-${c.rarityClass}">${c.rarity}</span>
+              <span><b>Weak:</b> ${c.weakness}</span>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="chk-${cid}" ${isOwned ? "checked" : ""}
+                     onchange="toggleOwned('${cid}', this.checked)">
+              <label for="chk-${cid}">I have this card</label>
+            </div>
+          </div>
+        </div>`;
+    }
+    html += `</div></div>`;
+  }
+  container.innerHTML = html;
+  updateCount();
+}
+
+function toggleOwned(cid, checked) {
+  const owned = loadOwned();
+  owned[cid] = checked;
+  saveOwned(owned);
+  const el = document.getElementById(`card-${cid}`);
+  if (el) el.classList.toggle("owned", checked);
+  updateCount();
+}
+
+document.getElementById("date-str").textContent = new Date().toLocaleDateString("en-US", {
+  year: "numeric", month: "long", day: "numeric"
+});
+
+render();
+</script>
+</body>
+</html>

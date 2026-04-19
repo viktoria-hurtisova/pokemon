@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wishlist - Pok&eacute;mon Card Checklist</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #7ec8e3;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 6px;
+    color: #e8a0e8;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .stats-bar {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: #aaa;
+  }
+
+  .stats-bar span {
+    font-weight: bold;
+    color: #e8a0e8;
+  }
+
+  .set-group { margin-bottom: 30px; }
+
+  .set-header {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f0c040;
+    border-bottom: 2px solid #f0c04055;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: #16213e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .2s;
+    position: relative;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .card:hover { box-shadow: 0 0 12px rgba(232,160,232,.35); }
+  .card.owned { border-color: #4caf50; }
+  .card.owned .owned-badge { display: block; }
+
+  .owned-badge {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #4caf50;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+
+  .card-img-wrap {
+    background: #0d1b36;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 10px;
+  }
+
+  .card-img-wrap img {
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: 6px;
+  }
+
+  .card-info {
+    padding: 10px 12px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-name { font-size: 15px; font-weight: bold; color: #fff; }
+
+  .card-meta {
+    font-size: 12px;
+    color: #aaa;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+
+  .card-meta b { color: #ccc; }
+
+  .rarity-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .rarity-sar   { background: #e65100; }
+  .rarity-ir    { background: #00838f; }
+  .rarity-holo  { background: #5c6bc0; }
+  .rarity-ur    { background: #6a1b9a; }
+  .rarity-uncommon { background: #558b2f; }
+  .rarity-promo { background: #b71c1c; }
+  .rarity-mar   { background: #d50000; }
+  .rarity-dr    { background: #1565c0; }
+  .rarity-common { background: #757575; }
+
+  .type-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .type-grass     { background: #4caf50; }
+  .type-fire      { background: #f44336; }
+  .type-water     { background: #2196f3; }
+  .type-electric  { background: #fbc02d; color: #333; }
+  .type-psychic   { background: #9c27b0; }
+  .type-fighting  { background: #a1887f; }
+  .type-dragon    { background: #7c4dff; }
+  .type-darkness  { background: #424242; }
+  .type-metal     { background: #78909c; }
+  .type-colorless { background: #78909c; }
+  .type-trainer   { background: #607d8b; }
+
+  .checkbox-row {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid #ffffff15;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .checkbox-row label {
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    color: #bbb;
+  }
+
+  .checkbox-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #4caf50;
+  }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 0; font-size: 11px; }
+    .back-link { display: none; }
+    h1 { color: #000; font-size: 22px; }
+    .subtitle { color: #555; }
+    .stats-bar { display: none; }
+    .set-header { color: #000; border-color: #000; font-size: 16px; }
+
+    .card-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+    .card {
+      background: #fff;
+      border: 1.5px solid #000;
+      border-radius: 6px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .card:hover { box-shadow: none; }
+    .card.owned { display: none !important; }
+    .card-img-wrap { background: #f5f5f5; min-height: 120px; padding: 6px; }
+
+    .card-img-wrap img {
+      max-height: 170px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .card-info { padding: 6px 8px 8px; }
+    .card-name { color: #000; font-size: 12px; }
+    .card-meta { color: #333; font-size: 10px; }
+    .card-meta b { color: #000; }
+
+    .rarity-badge, .type-badge, .owned-badge {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border: 2px solid #000;
+      border-radius: 2px;
+      background: #fff;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .checkbox-row label { color: #000; font-size: 11px; }
+    .set-group { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">&larr; Back to Dashboard</a>
+<h1>Wishlist</h1>
+<p class="subtitle">Mixed cards from various sets &mdash; <span id="date-str"></span></p>
+<div class="stats-bar">Collected: <span id="count-owned">0</span> / <span id="count-total">0</span></div>
+
+<div id="card-list"></div>
+
+<script>
+const CARDS = [
+  // ---- Phantom Forces (114) ----
+  { name: "Gengar EX", number: "114", setTotal: "119", set: "Phantom Forces", setSlug: "phantomforces", rarity: "Ultra Rare", rarityClass: "ur", type: "Psychic", hp: 170, weakness: "Darkness", retreat: 2 },
+  // ---- Evolving Skies (184) ----
+  { name: "Sylveon V", number: "184", setTotal: "225", set: "Evolving Skies", setSlug: "evolvingskies", rarity: "Ultra Rare", rarityClass: "ur", type: "Psychic", hp: 200, weakness: "Metal", retreat: 1 },
+  // ---- Pokemon Card 151 (079, 132, 175) ----
+  { name: "Slowpoke", number: "079", setTotal: "165", set: "Pokemon Card 151", setSlug: "pokemoncard151", rarity: "Common", rarityClass: "common", type: "Psychic", hp: 80, weakness: "Darkness", retreat: 2 },
+  { name: "Ditto", number: "132", setTotal: "165", set: "Pokemon Card 151", setSlug: "pokemoncard151", rarity: "Holo Rare", rarityClass: "holo", type: "Colorless", hp: 60, weakness: "Fighting", retreat: 1 },
+  { name: "Psyduck", number: "175", setTotal: "165", set: "Pokemon Card 151", setSlug: "pokemoncard151", rarity: "Illustration Rare", rarityClass: "ir", type: "Water", hp: 70, weakness: "Electric", retreat: 1 },
+  // ---- Scarlet Violet (211, 212, 213, 245) ----
+  { name: "Ralts", number: "211", setTotal: "198", set: "Scarlet Violet", setSlug: "scarletviolet", rarity: "Illustration Rare", rarityClass: "ir", type: "Psychic", hp: 70, weakness: "Darkness", retreat: 1 },
+  { name: "Kirlia", number: "212", setTotal: "198", set: "Scarlet Violet", setSlug: "scarletviolet", rarity: "Illustration Rare", rarityClass: "ir", type: "Psychic", hp: 90, weakness: "Darkness", retreat: 1 },
+  { name: "Fidough", number: "213", setTotal: "198", set: "Scarlet Violet", setSlug: "scarletviolet", rarity: "Illustration Rare", rarityClass: "ir", type: "Psychic", hp: 60, weakness: "Darkness", retreat: 2 },
+  { name: "Gardevoir ex", number: "245", setTotal: "198", set: "Scarlet Violet", setSlug: "scarletviolet", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 310, weakness: "Darkness", retreat: 2 },
+  // ---- Paldea Evolved (196, 197, 226, 227, 256) ----
+  { name: "Sprigatito", number: "196", setTotal: "198", set: "Paldea Evolved", setSlug: "paldeaevolved", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 60, weakness: "Fire", retreat: 1 },
+  { name: "Floragato", number: "197", setTotal: "198", set: "Paldea Evolved", setSlug: "paldeaevolved", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 90, weakness: "Fire", retreat: 1 },
+  { name: "Maushold", number: "226", setTotal: "198", set: "Paldea Evolved", setSlug: "paldeaevolved", rarity: "Illustration Rare", rarityClass: "ir", type: "Colorless", hp: 60, weakness: "Fighting", retreat: 1 },
+  { name: "Flamigo", number: "227", setTotal: "198", set: "Paldea Evolved", setSlug: "paldeaevolved", rarity: "Illustration Rare", rarityClass: "ir", type: "Colorless", hp: 110, weakness: "Electric", retreat: 1 },
+  { name: "Meowscarada ex", number: "256", setTotal: "198", set: "Paldea Evolved", setSlug: "paldeaevolved", rarity: "Special Art Rare", rarityClass: "sar", type: "Grass", hp: 310, weakness: "Fire", retreat: 2 },
+  // ---- Paradox Rift (190) ----
+  { name: "Vanillish", number: "190", setTotal: "182", set: "Paradox Rift", setSlug: "paradoxrift", rarity: "Illustration Rare", rarityClass: "ir", type: "Water", hp: 90, weakness: "Metal", retreat: 2 },
+  // ---- Silver Tempest (177) ----
+  { name: "Unown V", number: "177", setTotal: "195", set: "Silver Tempest", setSlug: "silvertempest", rarity: "Ultra Rare", rarityClass: "ur", type: "Psychic", hp: 180, weakness: "Darkness", retreat: 1 },
+  // ---- Crown Zenith (h24, h48, h64) ----
+  { name: "Miltank", number: "h24", setTotal: null, set: "Crown Zenith", setSlug: "crownzenith", rarity: "Galarian Gallery", rarityClass: "holo", type: "Colorless", hp: 110, weakness: "Fighting", retreat: 2, displayNum: "SH24" },
+  { name: "Zacian V", number: "h48", setTotal: null, set: "Crown Zenith", setSlug: "crownzenith", rarity: "Galarian Gallery", rarityClass: "ur", type: "Psychic", hp: 220, weakness: "Metal", retreat: 2, displayNum: "SH48" },
+  { name: "Melony", number: "h64", setTotal: null, set: "Crown Zenith", setSlug: "crownzenith", rarity: "Galarian Gallery", rarityClass: "uncommon", type: "Trainer", hp: null, weakness: null, retreat: null, displayNum: "SH64" },
+  // ---- Paldean Fates (236) ----
+  { name: "Clive", number: "236", setTotal: "91", set: "Paldean Fates", setSlug: "paldeanfates", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  // ---- Temporal Forces (165, 166, 167, 206) ----
+  { name: "Deerling", number: "165", setTotal: "162", set: "Temporal Forces", setSlug: "temporalforces", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 70, weakness: "Fire", retreat: 1 },
+  { name: "Sawsbuck", number: "166", setTotal: "162", set: "Temporal Forces", setSlug: "temporalforces", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 130, weakness: "Fire", retreat: 2 },
+  { name: "Litten", number: "167", setTotal: "162", set: "Temporal Forces", setSlug: "temporalforces", rarity: "Illustration Rare", rarityClass: "ir", type: "Fire", hp: 70, weakness: "Water", retreat: 2 },
+  { name: "Iron Crown ex", number: "206", setTotal: "162", set: "Temporal Forces", setSlug: "temporalforces", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 220, weakness: "Darkness", retreat: 2 },
+  // ---- Twilight Masquerade (185, 186) ----
+  { name: "Applin", number: "185", setTotal: "167", set: "Twilight Masquerade", setSlug: "twilightmasquerade", rarity: "Illustration Rare", rarityClass: "ir", type: "Dragon", hp: 40, weakness: "None", retreat: 1 },
+  { name: "Tatsugiri", number: "186", setTotal: "167", set: "Twilight Masquerade", setSlug: "twilightmasquerade", rarity: "Illustration Rare", rarityClass: "ir", type: "Dragon", hp: 70, weakness: "None", retreat: 1 },
+  // ---- Stellar Crown (167) ----
+  { name: "Hydrapple ex", number: "167", setTotal: "142", set: "Stellar Crown", setSlug: "stellarcrown", rarity: "Special Art Rare", rarityClass: "sar", type: "Grass", hp: 330, weakness: "Fire", retreat: 3 },
+  // ---- Surging Sparks (207, 209, 210, 211, 245) ----
+  { name: "Clobbopus", number: "207", setTotal: "191", set: "Surging Sparks", setSlug: "surgingsparks", rarity: "Illustration Rare", rarityClass: "ir", type: "Fighting", hp: 70, weakness: "Psychic", retreat: 2 },
+  { name: "Skarmory", number: "209", setTotal: "191", set: "Surging Sparks", setSlug: "surgingsparks", rarity: "Illustration Rare", rarityClass: "ir", type: "Metal", hp: 110, weakness: "Electric", retreat: 1 },
+  { name: "Flapple", number: "210", setTotal: "191", set: "Surging Sparks", setSlug: "surgingsparks", rarity: "Illustration Rare", rarityClass: "ir", type: "Dragon", hp: 80, weakness: "None", retreat: 1 },
+  { name: "Appletun", number: "211", setTotal: "191", set: "Surging Sparks", setSlug: "surgingsparks", rarity: "Illustration Rare", rarityClass: "ir", type: "Dragon", hp: 90, weakness: "None", retreat: 3 },
+  { name: "Jasmine's Gaze", number: "245", setTotal: "191", set: "Surging Sparks", setSlug: "surgingsparks", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  // ---- Prismatic Evolutions (041, 158) ----
+  { name: "Sylveon ex", number: "041", setTotal: "131", set: "Prismatic Evolutions", setSlug: "prismaticevolutions", rarity: "Double Rare", rarityClass: "dr", type: "Psychic", hp: 270, weakness: "Metal", retreat: 2 },
+  { name: "Iron Crown ex", number: "158", setTotal: "131", set: "Prismatic Evolutions", setSlug: "prismaticevolutions", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 220, weakness: "Darkness", retreat: 2 },
+  // ---- Terastal Festival ex (212) ----
+  { name: "Sylveon ex", number: "212", setTotal: "187", set: "Terastal Festival ex", setSlug: "terastalfestivalex", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 270, weakness: "Metal", retreat: 2 },
+  // ---- Ascended Heroes (236, 269, 277, 282) ----
+  { name: "Slurpuff", number: "236", setTotal: "217", set: "Ascended Heroes", setSlug: "ascendedheroes", rarity: "Illustration Rare", rarityClass: "ir", type: "Psychic", hp: 120, weakness: "None", retreat: 2 },
+  { name: "Mega Gengar ex", number: "269", setTotal: "217", set: "Ascended Heroes", setSlug: "ascendedheroes", rarity: "Mega Art Rare", rarityClass: "mar", type: "Darkness", hp: 350, weakness: "Fighting", retreat: 2 },
+  { name: "Pikachu ex", number: "277", setTotal: "217", set: "Ascended Heroes", setSlug: "ascendedheroes", rarity: "Special Art Rare", rarityClass: "sar", type: "Electric", hp: 200, weakness: "Fighting", retreat: 1 },
+  { name: "Mega Diancie ex", number: "282", setTotal: "217", set: "Ascended Heroes", setSlug: "ascendedheroes", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 270, weakness: "Metal", retreat: 1 },
+  // ---- Perfect Order (102, 113, 119, 122) ----
+  { name: "Mega Starmie ex", number: "102", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Illustration Rare", rarityClass: "ir", type: "Water", hp: 330, weakness: "Electric", retreat: 2 },
+  { name: "Poke Pad", number: "113", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Illustration Rare", rarityClass: "ir", type: "Trainer", hp: null, weakness: null, retreat: null },
+  { name: "Mega Clefable ex", number: "119", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 320, weakness: "Metal", retreat: 1 },
+  { name: "Jacinthe", number: "122", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  // ---- Mega Dream ex (230) ----
+  { name: "Mega Gengar ex", number: "230", setTotal: "193", set: "Mega Dream ex", setSlug: "megadreamex", rarity: "Ultra Rare", rarityClass: "ur", type: "Darkness", hp: 350, weakness: "Fighting", retreat: 2 },
+  // ---- SV Promos (044, 131, 174) ----
+  { name: "Charmander", number: "044", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Fire", hp: 60, weakness: "Water", retreat: 1 },
+  { name: "Kingdra ex", number: "131", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Water", hp: 310, weakness: "Electric", retreat: 1 },
+  { name: "Eevee ex", number: "174", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Colorless", hp: 200, weakness: "Fighting", retreat: 1 },
+  // ---- SV Promo JP (070) ----
+  { name: "Sylveon", number: "070", setTotal: null, set: "SV Promo JP", setSlug: "svpromo", rarity: "Promo", rarityClass: "promo", type: "Psychic", hp: 100, weakness: "Metal", retreat: 0 }
+];
+
+function getImgUrl(c) {
+  if (c.number.startsWith("h")) return `https://www.serebii.net/card/${c.setSlug}/${c.number}.jpg`;
+  return `https://www.serebii.net/card/${c.setSlug}/${parseInt(c.number, 10)}.jpg`;
+}
+
+function cardId(c) { return `${c.setSlug}-${c.number}`; }
+
+function loadOwned() {
+  try { return JSON.parse(localStorage.getItem("wishlist-owned") || "{}"); }
+  catch { return {}; }
+}
+
+function saveOwned(map) { localStorage.setItem("wishlist-owned", JSON.stringify(map)); }
+
+function updateCount() {
+  const owned = loadOwned();
+  document.getElementById("count-owned").textContent = Object.values(owned).filter(Boolean).length;
+  document.getElementById("count-total").textContent = CARDS.length;
+}
+
+function render() {
+  const owned = loadOwned();
+  const container = document.getElementById("card-list");
+  const grouped = {};
+  CARDS.forEach((c, i) => {
+    if (!grouped[c.set]) grouped[c.set] = [];
+    grouped[c.set].push({ ...c, _i: i });
+  });
+
+  let html = "";
+  for (const [setName, cards] of Object.entries(grouped)) {
+    html += `<div class="set-group"><div class="set-header">${setName}</div><div class="card-grid">`;
+    for (const c of cards) {
+      const cid = cardId(c);
+      const isOwned = !!owned[cid];
+      const dn = c.displayNum || (c.setTotal ? `${parseInt(c.number,10)} / ${c.setTotal}` : `#${parseInt(c.number,10)}`);
+      const hpStr = c.hp ? `<span><b>HP:</b> ${c.hp}</span>` : "";
+      const weakStr = c.weakness && c.weakness !== "None" ? `<span><b>Weak:</b> ${c.weakness}</span>` : "";
+      html += `
+        <div class="card ${isOwned ? "owned" : ""}" id="card-${cid}">
+          <div class="owned-badge">OWNED</div>
+          <div class="card-img-wrap">
+            <img src="${getImgUrl(c)}" alt="${c.name}" loading="lazy"
+                 onerror="this.onerror=null;this.alt='Image not available';">
+          </div>
+          <div class="card-info">
+            <div class="card-name">${c.name}</div>
+            <div class="card-meta">
+              <span><b>Set:</b> ${c.set}</span>
+              <span><b>#</b> ${dn}</span>
+              ${hpStr}
+            </div>
+            <div class="card-meta">
+              <span class="type-badge type-${c.type.toLowerCase()}">${c.type}</span>
+              <span class="rarity-badge rarity-${c.rarityClass}">${c.rarity}</span>
+              ${weakStr}
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="chk-${cid}" ${isOwned ? "checked" : ""}
+                     onchange="toggleOwned('${cid}', this.checked)">
+              <label for="chk-${cid}">I have this card</label>
+            </div>
+          </div>
+        </div>`;
+    }
+    html += `</div></div>`;
+  }
+  container.innerHTML = html;
+  updateCount();
+}
+
+function toggleOwned(cid, checked) {
+  const owned = loadOwned();
+  owned[cid] = checked;
+  saveOwned(owned);
+  const el = document.getElementById(`card-${cid}`);
+  if (el) el.classList.toggle("owned", checked);
+  updateCount();
+}
+
+document.getElementById("date-str").textContent = new Date().toLocaleDateString("en-US", {
+  year: "numeric", month: "long", day: "numeric"
+});
+
+render();
+</script>
+</body>
+</html>

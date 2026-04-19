@@ -248,10 +248,48 @@
     .checkbox-row label { color: #000; font-size: 11px; }
     .set-group { break-inside: avoid; }
   }
+
+  #lock-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #1a1a2e;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #lock-screen.hidden { display: none; }
+  .lock-box {
+    background: #16213e; border-radius: 16px; padding: 40px 32px;
+    text-align: center; width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  }
+  .lock-box h2 { color: #fff; margin-bottom: 8px; font-size: 22px; }
+  .lock-box p { color: #888; font-size: 13px; margin-bottom: 24px; }
+  .lock-box input {
+    width: 100%; padding: 12px 16px; border-radius: 8px; border: 2px solid #333;
+    background: #0f0f23; color: #fff; font-size: 16px; outline: none;
+    margin-bottom: 16px; text-align: center;
+  }
+  .lock-box input:focus { border-color: #7ec8e3; }
+  .lock-box button {
+    width: 100%; padding: 12px; border: none; border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+  }
+  .lock-box button:hover { opacity: .9; }
+  .lock-error { color: #ef5350; font-size: 13px; margin-top: 8px; min-height: 20px; }
+  @media print { #lock-screen { display: none !important; } }
 </style>
 </head>
 <body>
 
+<div id="lock-screen">
+  <div class="lock-box">
+    <h2>&#128274; Private Collection</h2>
+    <p>Enter the password to view this page</p>
+    <input type="password" id="lock-pw" placeholder="Password" autofocus>
+    <button id="lock-btn">Unlock</button>
+    <div class="lock-error" id="lock-err"></div>
+  </div>
+</div>
+
+<div id="app-content" style="display:none">
 <a class="back-link" href="index.html">&larr; Back to Dashboard</a>
 <h1>Wishlist</h1>
 <p class="subtitle">Mixed cards from various sets &mdash; <span id="date-str"></span></p>
@@ -416,6 +454,31 @@ document.getElementById("date-str").textContent = new Date().toLocaleDateString(
 });
 
 render();
+</script>
+</div>
+
+<script>
+const HASH = "cdb1b5a8f8ddb270135b9d7b27cdf57e5e346d92b53d2bdc595a50b26029ab32";
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(msg));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
+async function unlock() {
+  const pw = document.getElementById("lock-pw").value;
+  if ((await sha256(pw)) === HASH) {
+    sessionStorage.setItem("poke-auth", "1");
+    document.getElementById("lock-screen").classList.add("hidden");
+    document.getElementById("app-content").style.display = "";
+  } else {
+    document.getElementById("lock-err").textContent = "Wrong password";
+  }
+}
+if (sessionStorage.getItem("poke-auth") === "1") {
+  document.getElementById("lock-screen").classList.add("hidden");
+  document.getElementById("app-content").style.display = "";
+}
+document.getElementById("lock-btn").addEventListener("click", unlock);
+document.getElementById("lock-pw").addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
 </script>
 </body>
 </html>

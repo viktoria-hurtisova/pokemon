@@ -343,7 +343,7 @@ const WISHLIST_TOTAL = 50;
 function countOwned(key) {
   try {
     const map = JSON.parse(localStorage.getItem(key) || "{}");
-    return Object.values(map).filter(Boolean).length;
+    return Object.values(map).filter(v => v === "owned" || v === true).length;
   } catch { return 0; }
 }
 

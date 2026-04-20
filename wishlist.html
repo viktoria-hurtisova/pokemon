@@ -81,14 +81,15 @@
 
   .card:hover { box-shadow: 0 0 12px rgba(232,160,232,.35); }
   .card.owned { border-color: #4caf50; }
-  .card.owned .owned-badge { display: block; }
+  .card.owned .status-badge { display: block; background: #4caf50; }
+  .card.ontheway { border-color: #ff9800; }
+  .card.ontheway .status-badge { display: block; background: #ff9800; }
 
-  .owned-badge {
+  .status-badge {
     display: none;
     position: absolute;
     top: 8px;
     right: 8px;
-    background: #4caf50;
     color: #fff;
     font-size: 11px;
     font-weight: bold;
@@ -172,27 +173,38 @@
   .type-colorless { background: #78909c; }
   .type-trainer   { background: #607d8b; }
 
-  .checkbox-row {
+  .status-row {
     margin-top: auto;
     padding-top: 8px;
     border-top: 1px solid #ffffff15;
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
 
-  .checkbox-row label {
+  .status-btn {
+    width: 100%;
+    padding: 7px 12px;
+    border: 2px solid #555;
+    border-radius: 6px;
+    background: transparent;
+    color: #bbb;
     font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
     user-select: none;
-    color: #bbb;
+    transition: all .15s;
   }
 
-  .checkbox-row input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: #4caf50;
+  .status-btn:hover { border-color: #888; color: #fff; }
+
+  .status-btn.ontheway {
+    border-color: #ff9800;
+    color: #ff9800;
+    background: #ff980015;
+  }
+
+  .status-btn.owned {
+    border-color: #4caf50;
+    color: #4caf50;
+    background: #4caf5015;
   }
 
   @media print {
@@ -228,24 +240,17 @@
     .card-meta { color: #333; font-size: 10px; }
     .card-meta b { color: #000; }
 
-    .rarity-badge, .type-badge, .owned-badge {
+    .rarity-badge, .type-badge, .status-badge {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
 
-    .checkbox-row input[type="checkbox"] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border: 2px solid #000;
-      border-radius: 2px;
-      background: #fff;
+    .status-btn {
+      font-size: 11px;
+      padding: 4px 8px;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-
-    .checkbox-row label { color: #000; font-size: 11px; }
     .set-group { break-inside: avoid; }
   }
 
@@ -388,7 +393,7 @@ function saveOwned(map) { localStorage.setItem("wishlist-owned", JSON.stringify(
 
 function updateCount() {
   const owned = loadOwned();
-  document.getElementById("count-owned").textContent = Object.values(owned).filter(Boolean).length;
+  document.getElementById("count-owned").textContent = Object.values(owned).filter(v => v === "owned" || v === true).length;
   document.getElementById("count-total").textContent = CARDS.length;
 }
 
@@ -406,13 +411,17 @@ function render() {
     html += `<div class="set-group"><div class="set-header">${setName}</div><div class="card-grid">`;
     for (const c of cards) {
       const cid = cardId(c);
-      const isOwned = !!owned[cid];
+      const state = owned[cid] === true ? "owned" : (owned[cid] || "");
+      const cardClass = state === "owned" ? "owned" : state === "ontheway" ? "ontheway" : "";
+      const badgeText = state === "owned" ? "OWNED" : state === "ontheway" ? "ON THE WAY" : "";
+      const btnClass = state === "owned" ? "owned" : state === "ontheway" ? "ontheway" : "";
+      const btnText = state === "owned" ? "&#10003; Owned" : state === "ontheway" ? "&#128230; On the way" : "&#9744; Don't have yet";
       const dn = c.displayNum || (c.setTotal ? `${parseInt(c.number,10)} / ${c.setTotal}` : `#${parseInt(c.number,10)}`);
       const hpStr = c.hp ? `<span><b>HP:</b> ${c.hp}</span>` : "";
       const weakStr = c.weakness && c.weakness !== "None" ? `<span><b>Weak:</b> ${c.weakness}</span>` : "";
       html += `
-        <div class="card ${isOwned ? "owned" : ""}" id="card-${cid}">
-          <div class="owned-badge">OWNED</div>
+        <div class="card ${cardClass}" id="card-${cid}">
+          <div class="status-badge">${badgeText}</div>
           <div class="card-img-wrap">
             <img src="${getImgUrl(c)}" alt="${c.name}" loading="lazy"
                  onerror="this.onerror=null;this.alt='Image not available';">
@@ -429,10 +438,8 @@ function render() {
               <span class="rarity-badge rarity-${c.rarityClass}">${c.rarity}</span>
               ${weakStr}
             </div>
-            <div class="checkbox-row">
-              <input type="checkbox" id="chk-${cid}" ${isOwned ? "checked" : ""}
-                     onchange="toggleOwned('${cid}', this.checked)">
-              <label for="chk-${cid}">I have this card</label>
+            <div class="status-row">
+              <button class="status-btn ${btnClass}" onclick="cycleState('${cid}')">${btnText}</button>
             </div>
           </div>
         </div>`;
@@ -443,12 +450,26 @@ function render() {
   updateCount();
 }
 
-function toggleOwned(cid, checked) {
+function cycleState(cid) {
   const owned = loadOwned();
-  owned[cid] = checked;
+  const cur = owned[cid] === true ? "owned" : (owned[cid] || "");
+  const next = cur === "" ? "ontheway" : cur === "ontheway" ? "owned" : "";
+  if (next) owned[cid] = next; else delete owned[cid];
   saveOwned(owned);
+
   const el = document.getElementById(`card-${cid}`);
-  if (el) el.classList.toggle("owned", checked);
+  if (!el) return;
+  el.classList.remove("owned", "ontheway");
+  if (next) el.classList.add(next);
+
+  const badge = el.querySelector(".status-badge");
+  badge.textContent = next === "owned" ? "OWNED" : next === "ontheway" ? "ON THE WAY" : "";
+  badge.style.display = next ? "block" : "none";
+
+  const btn = el.querySelector(".status-btn");
+  btn.className = "status-btn" + (next ? " " + next : "");
+  btn.innerHTML = next === "owned" ? "&#10003; Owned" : next === "ontheway" ? "&#128230; On the way" : "&#9744; Don't have yet";
+
   updateCount();
 }
 

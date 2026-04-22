@@ -39,7 +39,7 @@
 
   .stats-bar {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
     font-size: 15px;
     color: #aaa;
   }
@@ -47,6 +47,26 @@
   .stats-bar span {
     font-weight: bold;
     color: #e8a0e8;
+  }
+
+  .stats-detail {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #888;
+  }
+
+  .stats-detail b { color: #bbb; font-weight: 600; }
+
+  .sync-note {
+    text-align: center;
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .set-group { margin-bottom: 30px; }
@@ -299,9 +319,10 @@
 <h1>Wishlist</h1>
 <p class="subtitle">Mixed cards from various sets &mdash; <span id="date-str"></span></p>
 <div class="stats-bar">Collected: <span id="count-owned">0</span> / <span id="count-total">0</span></div>
+<div class="stats-detail" id="stats-detail"></div>
+<div class="sync-note" id="sync-note"></div>
 
-<div id="card-list"></div>
-
+<script src="js/collection-progress.js"></script>
 <script>
 const CARDS = [
   // ---- Phantom Forces (114) ----
@@ -384,17 +405,70 @@ function getImgUrl(c) {
 
 function cardId(c) { return `${c.setSlug}-${c.number}`; }
 
+const LIST_ID = "wishlist";
+let progressMap = {};
+
 function loadOwned() {
-  try { return JSON.parse(localStorage.getItem("wishlist-owned") || "{}"); }
-  catch { return {}; }
+  return progressMap;
 }
 
-function saveOwned(map) { localStorage.setItem("wishlist-owned", JSON.stringify(map)); }
+function setSyncNote(msg, color) {
+  const el = document.getElementById("sync-note");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.style.color = color || "#777";
+}
+
+function canSaveProgressFiles() {
+  const h = location.hostname;
+  return h === "127.0.0.1" || h === "localhost";
+}
+
+function envHint() {
+  if (canSaveProgressFiles()) {
+    setSyncNote(
+      "Local server: clicks save to progress/wishlist.json. Commit and push so GitHub Pages picks up changes.",
+      "#e8a0e8"
+    );
+  } else if (location.protocol === "file:") {
+    setSyncNote(
+      "Opened as a file: the browser cannot write into progress/wishlist.json. Run npm run local and open http://127.0.0.1:8765/wishlist.html to save changes you can commit.",
+      "#ffb74d"
+    );
+  } else {
+    setSyncNote(
+      "Published copy: data comes from progress/wishlist.json in the repo. You can click cards to preview in this tab only—refresh restores the site; nothing here changes Git or your files.",
+      "#888"
+    );
+  }
+}
+
+async function pullProgress() {
+  progressMap = await PokeProgress.loadListProgress(LIST_ID);
+}
+
+async function persistProgress() {
+  if (!canSaveProgressFiles()) return;
+  const ok = await PokeProgress.saveListProgress(LIST_ID, progressMap);
+  if (ok) {
+    setSyncNote("Saved to progress/wishlist.json — commit and push when you are ready.", "#81c784");
+  } else {
+    setSyncNote("Could not write the file. Start the local server: npm run local — then open http://127.0.0.1:8765/wishlist.html", "#ffb74d");
+  }
+}
 
 function updateCount() {
-  const owned = loadOwned();
-  document.getElementById("count-owned").textContent = Object.values(owned).filter(v => v === "owned" || v === true).length;
-  document.getElementById("count-total").textContent = CARDS.length;
+  const total = CARDS.length;
+  const c = PokeProgress.countFromMap(progressMap, total);
+  document.getElementById("count-owned").textContent = c.owned;
+  document.getElementById("count-total").textContent = total;
+  const det = document.getElementById("stats-detail");
+  if (det) {
+    det.innerHTML =
+      "<b>Owned:</b> " + c.owned +
+      " &nbsp;|&nbsp; <b>On the way:</b> " + c.ontheway +
+      " &nbsp;|&nbsp; <b>Not yet:</b> " + c.missing;
+  }
 }
 
 function render() {
@@ -450,12 +524,12 @@ function render() {
   updateCount();
 }
 
-function cycleState(cid) {
+async function cycleState(cid) {
   const owned = loadOwned();
   const cur = owned[cid] === true ? "owned" : (owned[cid] || "");
   const next = cur === "" ? "ontheway" : cur === "ontheway" ? "owned" : "";
   if (next) owned[cid] = next; else delete owned[cid];
-  saveOwned(owned);
+  if (canSaveProgressFiles()) await persistProgress();
 
   const el = document.getElementById(`card-${cid}`);
   if (!el) return;
@@ -477,7 +551,11 @@ document.getElementById("date-str").textContent = new Date().toLocaleDateString(
   year: "numeric", month: "long", day: "numeric"
 });
 
-render();
+(async function boot() {
+  await pullProgress();
+  envHint();
+  render();
+})();
 </script>
 </div>
 

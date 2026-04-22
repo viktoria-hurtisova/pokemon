@@ -49,7 +49,7 @@
   .total-stats {
     display: flex;
     justify-content: space-around;
-    gap: 20px;
+    gap: 16px;
     flex-wrap: wrap;
   }
 
@@ -148,6 +148,26 @@
     display: flex;
     flex-wrap: wrap;
     gap: 4px 16px;
+  }
+
+  .list-breakdown {
+    font-size: 12px;
+    color: #888;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 4px;
+  }
+
+  .list-breakdown b { color: #ccc; font-weight: 600; }
+
+  .pages-hint {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    max-width: 520px;
+    margin: 28px auto 0;
+    line-height: 1.45;
   }
 
   .list-stats {
@@ -273,15 +293,19 @@
   <div class="total-stats">
     <div class="stat-block">
       <div class="stat-number" id="total-owned" style="color:#4caf50">0</div>
-      <div class="stat-label">Cards Owned</div>
+      <div class="stat-label">Owned</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-number" id="total-ontheway" style="color:#ff9800">0</div>
+      <div class="stat-label">On the way</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-number" id="total-none" style="color:#aaa">0</div>
+      <div class="stat-label">Not yet</div>
     </div>
     <div class="stat-block">
       <div class="stat-number" id="total-cards" style="color:#7ec8e3">0</div>
-      <div class="stat-label">Total Cards</div>
-    </div>
-    <div class="stat-block">
-      <div class="stat-number" id="total-missing" style="color:#ef5350">0</div>
-      <div class="stat-label">Still Missing</div>
+      <div class="stat-label">Total cards</div>
     </div>
   </div>
   <div class="progress-bar-wrap">
@@ -297,6 +321,11 @@
       <span>29 cards</span>
       <span>4 sets + promos</span>
       <span>#1017 Ogerpon</span>
+    </div>
+    <div class="list-breakdown" id="ogerpon-breakdown">
+      <span><b>Owned:</b> <span id="ogerpon-bc-owned">0</span></span>
+      <span><b>On the way:</b> <span id="ogerpon-bc-way">0</span></span>
+      <span><b>Not yet:</b> <span id="ogerpon-bc-none">29</span></span>
     </div>
     <div class="list-stats">
       <div>
@@ -316,14 +345,19 @@
   <div class="list-card wishlist-accent">
     <h3><span class="icon">&#11088;</span> Wishlist</h3>
     <div class="list-meta">
-      <span>12 cards</span>
-      <span>7 sets</span>
+      <span>50 cards</span>
+      <span>Many sets</span>
       <span>Mixed Pok&eacute;mon &amp; Trainers</span>
+    </div>
+    <div class="list-breakdown" id="wishlist-breakdown">
+      <span><b>Owned:</b> <span id="wishlist-bc-owned">0</span></span>
+      <span><b>On the way:</b> <span id="wishlist-bc-way">0</span></span>
+      <span><b>Not yet:</b> <span id="wishlist-bc-none">50</span></span>
     </div>
     <div class="list-stats">
       <div>
         <div class="list-stat-num" id="wishlist-owned" style="color:#e8a0e8">0</div>
-        <div class="stat-label">owned of 12</div>
+        <div class="stat-label">owned of 50</div>
       </div>
       <div class="list-progress-wrap">
         <div class="list-progress-bar">
@@ -336,48 +370,88 @@
   </div>
 </div>
 
-<script>
-const OGERPON_TOTAL = 29;
-const WISHLIST_TOTAL = 50;
+<p class="pages-hint" id="pages-hint"></p>
 
-function countOwned(key) {
-  try {
-    const map = JSON.parse(localStorage.getItem(key) || "{}");
-    return Object.values(map).filter(v => v === "owned" || v === true).length;
-  } catch { return 0; }
+<script src="js/collection-progress.js"></script>
+<script>
+async function loadJson(url) {
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(url + " " + res.status);
+  return res.json();
 }
 
-function update() {
-  const og = countOwned("ogerpon-owned");
-  const wl = countOwned("wishlist-owned");
-  const totalOwned = og + wl;
-  const totalCards = OGERPON_TOTAL + WISHLIST_TOTAL;
-  const totalMissing = totalCards - totalOwned;
+function setHint() {
+  const h = document.getElementById("pages-hint");
+  const host = location.hostname;
+  if (host === "127.0.0.1" || host === "localhost") {
+    h.textContent =
+      "Local server: checklist pages can write to progress/*.json here. Commit and push to refresh GitHub Pages.";
+  } else if (location.protocol === "file:") {
+    h.textContent =
+      "Opened as a file: use npm run local and open http://127.0.0.1:8765/ so checklist pages can save into progress/*.json (browsers cannot write those files from a double-clicked HTML file).";
+  } else {
+    h.textContent =
+      "This dashboard only shows progress from committed progress/*.json on GitHub. Checklist pages let you click for a tab-only preview there; only http://127.0.0.1:8765 (npm run local) saves files you can push.";
+  }
+}
+
+async function update() {
+  let meta = { lists: [] };
+  try {
+    meta = await loadJson("./lists-meta.json");
+  } catch (_) {
+    document.getElementById("pages-hint").textContent = "Could not load lists-meta.json.";
+    return;
+  }
+
+  const maps = {};
+  for (const L of meta.lists) {
+    try {
+      maps[L.id] = await loadJson("./" + L.progressFile);
+    } catch (_) {
+      maps[L.id] = {};
+    }
+  }
+
+  let totalOwned = 0;
+  let totalOntheway = 0;
+  let totalNone = 0;
+  let totalCards = 0;
+
+  for (const L of meta.lists) {
+    const c = PokeProgress.countFromMap(maps[L.id], L.total);
+    totalOwned += c.owned;
+    totalOntheway += c.ontheway;
+    totalNone += c.missing;
+    totalCards += L.total;
+
+    const pre = L.id === "ogerpon" ? "ogerpon" : "wishlist";
+    document.getElementById(pre + "-owned").textContent = c.owned;
+    document.getElementById(pre + "-bc-owned").textContent = c.owned;
+    document.getElementById(pre + "-bc-way").textContent = c.ontheway;
+    document.getElementById(pre + "-bc-none").textContent = c.missing;
+    const pct = L.total ? Math.round((c.owned / L.total) * 100) : 0;
+    document.getElementById(pre + "-bar").style.width = pct + "%";
+    document.getElementById(pre + "-pct").textContent = pct + "%";
+  }
 
   document.getElementById("total-owned").textContent = totalOwned;
+  document.getElementById("total-ontheway").textContent = totalOntheway;
+  document.getElementById("total-none").textContent = totalNone;
   document.getElementById("total-cards").textContent = totalCards;
-  document.getElementById("total-missing").textContent = totalMissing;
 
   const totalPct = totalCards ? Math.round((totalOwned / totalCards) * 100) : 0;
   document.getElementById("total-bar").style.width = totalPct + "%";
-  document.getElementById("total-pct").textContent = totalPct + "% complete";
-
-  document.getElementById("ogerpon-owned").textContent = og;
-  const ogPct = OGERPON_TOTAL ? Math.round((og / OGERPON_TOTAL) * 100) : 0;
-  document.getElementById("ogerpon-bar").style.width = ogPct + "%";
-  document.getElementById("ogerpon-pct").textContent = ogPct + "%";
-
-  document.getElementById("wishlist-owned").textContent = wl;
-  const wlPct = WISHLIST_TOTAL ? Math.round((wl / WISHLIST_TOTAL) * 100) : 0;
-  document.getElementById("wishlist-bar").style.width = wlPct + "%";
-  document.getElementById("wishlist-pct").textContent = wlPct + "%";
+  document.getElementById("total-pct").textContent =
+    totalPct + "% owned — " + totalOntheway + " on the way, " + totalNone + " not yet";
 }
 
 document.getElementById("date-str").textContent = "Last updated: " +
   new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
-update();
-window.addEventListener("focus", update);
+setHint();
+update().catch(() => {});
+window.addEventListener("focus", () => { update().catch(() => {}); });
 </script>
 </div>
 

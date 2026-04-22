@@ -1,0 +1,20 @@
+{
+  "lists": [
+    {
+      "id": "ogerpon",
+      "title": "Ogerpon Collection",
+      "total": 29,
+      "progressFile": "progress/ogerpon.json",
+      "page": "ogerpon-cards.html",
+      "accent": "ogerpon"
+    },
+    {
+      "id": "wishlist",
+      "title": "Wishlist",
+      "total": 50,
+      "progressFile": "progress/wishlist.json",
+      "page": "wishlist.html",
+      "accent": "wishlist"
+    }
+  ]
+}

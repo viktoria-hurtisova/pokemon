@@ -1,0 +1,7 @@
+{
+  "name": "pokemon-card-collection",
+  "private": true,
+  "scripts": {
+    "local": "node tools/local-server.mjs"
+  }
+}

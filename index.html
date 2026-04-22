@@ -29,6 +29,81 @@
     margin-bottom: 36px;
   }
 
+  .header-ref {
+    text-align: center;
+    margin: 36px auto 18px;
+  }
+
+  .lists-grid + .header-ref + .refs-section {
+    margin-top: 0;
+  }
+
+  .header-ref a {
+    display: inline-block;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #e8eef5;
+    background: #2d4a6f;
+    border: 1px solid #4a6fa5;
+    transition: background .15s, border-color .15s;
+  }
+
+  .header-ref a:hover {
+    background: #3d5a7f;
+    border-color: #6b8fc4;
+  }
+
+  .refs-section {
+    max-width: 700px;
+    margin: 36px auto 0;
+    background: #16213e;
+    border-radius: 14px;
+    padding: 22px 28px;
+    border: 1px solid #333;
+  }
+
+  .refs-section h2 {
+    font-size: 18px;
+    color: #aaa;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .refs-section-desc {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 16px;
+    line-height: 1.45;
+  }
+
+  .refs-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .refs-buttons a {
+    display: inline-block;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    color: #e8eef5;
+    background: #2d4a6f;
+    border: 1px solid #4a6fa5;
+    transition: background .15s, border-color .15s;
+  }
+
+  .refs-buttons a:hover {
+    background: #3d5a7f;
+    border-color: #6b8fc4;
+  }
+
   .total-section {
     max-width: 700px;
     margin: 0 auto 40px;
@@ -228,6 +303,23 @@
     body { background: #fff; color: #000; padding: 10px; }
     h1 { color: #000; }
     .subtitle { color: #555; }
+    .header-ref a {
+      color: #000;
+      background: #e8eef5;
+      border: 1px solid #333;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .refs-section { background: #fff; border: 1.5px solid #000; }
+    .refs-section h2 { color: #333; }
+    .refs-section-desc { color: #555; }
+    .refs-buttons a {
+      color: #000;
+      background: #e8eef5;
+      border: 1px solid #333;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
     .total-section, .list-card { background: #fff; border: 1.5px solid #000; }
     .total-section h2 { color: #333; }
     .stat-number { color: #000; }
@@ -369,6 +461,19 @@
     <a class="list-link" href="wishlist.html">Open Wishlist &rarr;</a>
   </div>
 </div>
+
+<p class="header-ref">
+  <a href="https://www.serebii.net/" target="_blank" rel="noopener noreferrer">Serebii.net &mdash; card reference</a>
+</p>
+
+<section class="refs-section" aria-labelledby="shops-heading">
+  <h2 id="shops-heading">Shops (singles)</h2>
+  <p class="refs-section-desc">E-shops that sell individual Pok&eacute;mon cards (singles) for browsing stock and prices.</p>
+  <div class="refs-buttons">
+    <a href="https://www.kartano.cz/" target="_blank" rel="noopener noreferrer">Kartano.cz</a>
+    <a href="https://www.alola.cz/" target="_blank" rel="noopener noreferrer">Alola.cz</a>
+  </div>
+</section>
 
 <p class="pages-hint" id="pages-hint"></p>
 

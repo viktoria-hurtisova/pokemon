@@ -282,6 +282,36 @@
   }
 
   .card:hover { box-shadow: 0 0 12px rgba(232,160,232,.35); }
+
+  .pricey-ribbon {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #1a1a2e;
+    background: linear-gradient(135deg, #e8c547, #c9a227);
+    padding: 3px 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  }
+
+  .expensive-stat-note {
+    text-align: center;
+    font-size: 12px;
+    color: #a89060;
+    max-width: 640px;
+    margin: -4px auto 12px;
+    line-height: 1.45;
+  }
+
+  .expensive-stat-note:empty {
+    display: none !important;
+  }
+
   .card.owned { border-color: #4caf50; }
   .card.owned .status-badge { display: block; background: #4caf50; }
   .card.ontheway { border-color: #ff9800; }
@@ -504,6 +534,7 @@
 <p class="subtitle">Mixed cards from various sets &mdash; <span id="date-str"></span></p>
 <div class="stats-bar">Collected: <span id="count-owned">0</span> / <span id="count-total">0</span></div>
 <div class="stats-detail" id="stats-detail"></div>
+<p class="expensive-stat-note" id="expensive-stat-note" aria-live="polite"></p>
 <div class="sync-note" id="sync-note"></div>
 
 <div class="filters-stack wishlist-filters">
@@ -639,7 +670,37 @@ const CARDS = [
   // ---- SM Promos (210) ----
   { name: "Moltres & Articuno GX", number: "210", setTotal: null, set: "SM Promos", setSlug: "smpromos", rarity: "Ultra Rare", rarityClass: "ur", type: "Colorless", hp: 300, weakness: "Electric", retreat: 3 },
   // ---- SV Promo JP (070) ----
-  { name: "Sylveon", number: "070", setTotal: null, set: "SV Promo JP", setSlug: "svpromo", rarity: "Promo", rarityClass: "promo", type: "Psychic", hp: 100, weakness: "Metal", retreat: 0 }
+  { name: "Sylveon", number: "070", setTotal: null, set: "SV Promo JP", setSlug: "svpromo", rarity: "Promo", rarityClass: "promo", type: "Psychic", hp: 100, weakness: "Metal", retreat: 0 },
+  // ---- Pokemon Card 151 (166, 167, 198, 203) ----
+  { name: "Bulbasaur", number: "166", setTotal: "165", set: "Pokemon Card 151", setSlug: "151", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 70, weakness: "Fire", retreat: 2 },
+  { name: "Ivysaur", number: "167", setTotal: "165", set: "Pokemon Card 151", setSlug: "151", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 100, weakness: "Fire", retreat: 3 },
+  { name: "Venusaur ex", number: "198", setTotal: "165", set: "Pokemon Card 151", setSlug: "151", rarity: "Special Art Rare", rarityClass: "sar", type: "Grass", hp: 340, weakness: "Fire", retreat: 4 },
+  { name: "Erika's Invitation", number: "203", setTotal: "165", set: "Pokemon Card 151", setSlug: "151", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  // ---- Black Bolt (087, 091, 096) ----
+  { name: "Snivy", number: "087", setTotal: "86", set: "Black Bolt", setSlug: "blackbolt", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 70, weakness: "Fire", retreat: 1 },
+  { name: "Petilil", number: "091", setTotal: "86", set: "Black Bolt", setSlug: "blackbolt", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 60, weakness: "Fire", retreat: 1 },
+  { name: "Amoonguss", number: "096", setTotal: "86", set: "Black Bolt", setSlug: "blackbolt", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 120, weakness: "Fire", retreat: 2 },
+  // ---- Crown Zenith (h35) ----
+  { name: "Leafeon VSTAR", number: "h35", setTotal: null, set: "Crown Zenith", setSlug: "crownzenith", rarity: "Galarian Gallery", rarityClass: "ur", type: "Grass", hp: 260, weakness: "Fire", retreat: 2, displayNum: "SH35" },
+  // ---- Mega Evolution (186) ----
+  { name: "Wally's Compassion", number: "186", setTotal: "132", set: "Mega Evolution", setSlug: "megaevolution", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  // ---- Ascended Heroes (239, 267) ----
+  { name: "Team Rocket's Dugtrio", number: "239", setTotal: "217", set: "Ascended Heroes", setSlug: "ascendedheroes", rarity: "Illustration Rare", rarityClass: "ir", type: "Fighting", hp: 100, weakness: "Psychic", retreat: 1 },
+  { name: "Mega Diancie ex", number: "267", setTotal: "217", set: "Ascended Heroes", setSlug: "ascendedheroes", rarity: "Mega Art Rare", rarityClass: "mar", type: "Psychic", hp: 270, weakness: "Metal", retreat: 1 },
+  // ---- Special Deck Set ex (050) ----
+  { name: "Bulbasaur", number: "050", setTotal: "49", set: "Special Deck Set ex", setSlug: "specialdecksetexvenusaurcharizardblastoise", rarity: "Promo", rarityClass: "promo", type: "Grass", hp: 70, weakness: "Fire", retreat: 2 },
+  // ---- Journey Together (170, 184) ----
+  { name: "Hop's Wooloo", number: "170", setTotal: "159", set: "Journey Together", setSlug: "journeytogether", rarity: "Illustration Rare", rarityClass: "ir", type: "Colorless", hp: 70, weakness: "Fighting", retreat: 1 },
+  { name: "Lillie's Clefairy ex", number: "184", setTotal: "159", set: "Journey Together", setSlug: "journeytogether", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 190, weakness: "Metal", retreat: 2 },
+  // ---- Surging Sparks (195) ----
+  { name: "Castform Sunny Form", number: "195", setTotal: "191", set: "Surging Sparks", setSlug: "surgingsparks", rarity: "Illustration Rare", rarityClass: "ir", type: "Fire", hp: 70, weakness: "Water", retreat: 1 },
+  // ---- Phantasmal Flames (107, 126) ----
+  { name: "Ambipom", number: "107", setTotal: "94", set: "Phantasmal Flames", setSlug: "phantasmalflames", rarity: "Illustration Rare", rarityClass: "ir", type: "Colorless", hp: 110, weakness: "Fighting", retreat: 1 },
+  { name: "Rotom ex", number: "126", setTotal: "94", set: "Phantasmal Flames", setSlug: "phantasmalflames", rarity: "Special Art Rare", rarityClass: "sar", type: "Electric", hp: 190, weakness: "Fighting", retreat: 1 },
+  // ---- Lost Origin (h25) ----
+  { name: "Cook", number: "h25", setTotal: null, set: "Lost Origin", setSlug: "lostorigin", rarity: "Trainer Gallery", rarityClass: "ir", type: "Trainer", hp: null, weakness: null, retreat: null, displayNum: "SH25" },
+  // ---- Perfect Order (101) ----
+  { name: "Salazzle ex", number: "101", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Illustration Rare", rarityClass: "ir", type: "Fire", hp: 260, weakness: "Water", retreat: 1 }
 ];
 
 function getImgUrl(c) {
@@ -651,6 +712,8 @@ function cardId(c) { return `${c.setSlug}-${c.number}`; }
 
 const LIST_ID = "wishlist";
 let progressMap = {};
+/** @type {Set<string>} card ids from expensive-wishlist.json */
+let expensiveIdSet = new Set();
 
 /** @type {"all"|"missing"|"ontheway"|"owned"} */
 let filterStatus = "all";
@@ -671,6 +734,17 @@ function getCardState(c, owned) {
   if (v === true || v === "owned") return "owned";
   if (v === "ontheway") return "ontheway";
   return "missing";
+}
+
+function cardIsExpensive(c) {
+  return expensiveIdSet.has(cardId(c));
+}
+
+function wishlistStatSlots() {
+  return CARDS.map((c) => ({
+    id: cardId(c),
+    expensive: expensiveIdSet.has(cardId(c)),
+  }));
 }
 
 function cardMatchesFilters(c, owned) {
@@ -734,10 +808,22 @@ function canSaveProgressFiles() {
   return h === "127.0.0.1" || h === "localhost";
 }
 
+function updateExpensiveStatNote() {
+  const el = document.getElementById("expensive-stat-note");
+  if (!el) return;
+  if (!expensiveIdSet.size) {
+    el.textContent = "";
+    return;
+  }
+  el.textContent =
+    expensiveIdSet.size +
+    " pricey wishlist card(s) in expensive-wishlist.json are left out of the score until you mark them On the way or Owned.";
+}
+
 function envHint() {
   if (canSaveProgressFiles()) {
     setSyncNote(
-      "Local server: clicks save to progress/wishlist.json. Commit and push so GitHub Pages picks up changes.",
+      "Local server: clicks save to progress/wishlist.json. Edit expensive-wishlist.json for pricey grails (same card ids as in progress). Run npm run sync-wishlist-order after changing the CARDS list. Commit and push so GitHub Pages picks up changes.",
       "#e8a0e8"
     );
   } else if (location.protocol === "file:") {
@@ -747,7 +833,7 @@ function envHint() {
     );
   } else {
     setSyncNote(
-      "Published copy: data comes from progress/wishlist.json in the repo. You can click cards to preview in this tab only—refresh restores the site; nothing here changes Git or your files.",
+      "Published copy: data comes from progress/wishlist.json and expensive-wishlist.json in the repo. You can click cards to preview in this tab only—refresh restores the site; nothing here changes Git or your files.",
       "#888"
     );
   }
@@ -768,10 +854,9 @@ async function persistProgress() {
 }
 
 function updateCount() {
-  const total = CARDS.length;
-  const c = PokeProgress.countFromMap(progressMap, total);
+  const c = PokeProgress.countFromCardSlots(progressMap, wishlistStatSlots());
   document.getElementById("count-owned").textContent = c.owned;
-  document.getElementById("count-total").textContent = total;
+  document.getElementById("count-total").textContent = c.total;
   const det = document.getElementById("stats-detail");
   if (det) {
     det.innerHTML =
@@ -779,6 +864,7 @@ function updateCount() {
       " &nbsp;|&nbsp; <b>On the way:</b> " + c.ontheway +
       " &nbsp;|&nbsp; <b>Not yet:</b> " + c.missing;
   }
+  updateExpensiveStatNote();
 }
 
 function render() {
@@ -808,8 +894,10 @@ function render() {
       const dn = c.displayNum || (c.setTotal ? `${parseInt(c.number,10)} / ${c.setTotal}` : `#${parseInt(c.number,10)}`);
       const hpStr = c.hp ? `<span><b>HP:</b> ${c.hp}</span>` : "";
       const weakStr = c.weakness && c.weakness !== "None" ? `<span><b>Weak:</b> ${c.weakness}</span>` : "";
+      const priceyRibbon = cardIsExpensive(c) ? '<div class="pricey-ribbon" title="Excluded from stats until on the way or owned">Grail</div>' : "";
       html += `
         <div class="card ${cardClass}" id="card-${cid}">
+          ${priceyRibbon}
           <div class="status-badge">${badgeText}</div>
           <div class="card-img-wrap">
             <img src="${getImgUrl(c)}" alt="${c.name}" loading="lazy"
@@ -905,8 +993,21 @@ document.getElementById("date-str").textContent = new Date().toLocaleDateString(
   year: "numeric", month: "long", day: "numeric"
 });
 
+async function loadExpensiveWishlist() {
+  expensiveIdSet = new Set();
+  try {
+    const res = await fetch("./expensive-wishlist.json", { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && Array.isArray(data.ids)) {
+      expensiveIdSet = new Set(data.ids.map(String));
+    }
+  } catch (_) {}
+}
+
 (async function boot() {
   await pullProgress();
+  await loadExpensiveWishlist();
   envHint();
   initWishlistFilters();
   render();

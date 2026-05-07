@@ -40,12 +40,13 @@ To **edit** progress on your computer and then **publish** it on GitHub, follow 
    ```
 
 5. If the lock screen appears, enter your password.
-6. Open **Ogerpon** or **Wishlist** and click the status button on each card (cycles: not yet → on the way → owned → not yet).
+6. Open **Ogerpon**, **Wishlist**, or **Cosmos Holos** and click the status button on each card (cycles: not yet → on the way → owned → not yet).
 
    Each change is written to disk in:
 
    - `progress/ogerpon.json`
    - `progress/wishlist.json`
+   - `progress/cosmosholos.json`
 
 7. When you are finished, you can stop the server with **Ctrl+C** in the terminal (optional).
 
@@ -56,7 +57,7 @@ To **edit** progress on your computer and then **publish** it on GitHub, follow 
 1. Stage the progress files (and any other files you changed):
 
    ```text
-   git add progress/ogerpon.json progress/wishlist.json
+   git add progress/ogerpon.json progress/wishlist.json progress/cosmosholos.json
    ```
 
 2. Commit:

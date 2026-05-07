@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cosmos Holos - Pok&eacute;mon Card Checklist</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #7ec8e3;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 6px;
+    color: #9c7cf4;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .stats-bar {
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: #aaa;
+  }
+
+  .stats-bar span {
+    font-weight: bold;
+    color: #9c7cf4;
+  }
+
+  .stats-detail {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #888;
+  }
+
+  .stats-detail b { color: #bbb; font-weight: 600; }
+
+  .sync-note {
+    text-align: center;
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .filters-stack {
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 22px;
+  }
+
+  .filters-stack .filters-bar {
+    margin-bottom: 10px;
+  }
+
+  .filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px 14px;
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .filter-search-row {
+    width: 100%;
+  }
+
+  .filter-name-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid #3d3d55;
+    background: #222338;
+    color: #e0e0e8;
+    font-size: 14px;
+    font-family: inherit;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .filter-name-input::placeholder {
+    color: #6a6a80;
+  }
+
+  .filter-name-input:hover {
+    border-color: #55556e;
+  }
+
+  .filter-name-input:focus {
+    outline: none;
+    border-color: #9c7cf4;
+    box-shadow: 0 0 0 2px rgba(156,124,244,.25);
+  }
+
+  .seg-wrap {
+    --seg-count: 4;
+    --seg-index: 0;
+    position: relative;
+    display: inline-flex;
+    flex: 1 1 280px;
+    max-width: 520px;
+    min-width: min(100%, 280px);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid #3d3d55;
+    background: #222338;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .seg-slider {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc((100% - 8px) / var(--seg-count));
+    border-radius: 999px;
+    background: #4a4a62;
+    box-shadow: 0 1px 2px rgba(0,0,0,.25);
+    z-index: 0;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(calc(var(--seg-index) * 100%));
+    pointer-events: none;
+  }
+
+  .seg-track {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+  }
+
+  .seg-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 9px 8px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: #b0b0c8;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .seg-btn:hover { color: #e8e8f0; }
+
+  .seg-btn.active {
+    color: #fff;
+  }
+
+  .set-dropdown-wrap {
+    flex: 0 0 auto;
+    position: relative;
+  }
+
+  .filter-set-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 10px 36px 10px 16px;
+    border-radius: 999px;
+    border: 1px solid #3d3d55;
+    background: #222338 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b0b0c8' d='M2.5 4.5L6 8l3.5-3.5' stroke='%23b0b0c8' stroke-width='1.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+    color: #e0e0e8;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 160px;
+    max-width: min(100vw - 40px, 280px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .filter-set-select:hover {
+    border-color: #55556e;
+    color: #fff;
+  }
+
+  .filter-set-select:focus {
+    outline: none;
+    border-color: #9c7cf4;
+    box-shadow: 0 0 0 2px rgba(156,124,244,.25);
+  }
+
+  .filter-hint {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-top: -12px;
+    margin-bottom: 18px;
+  }
+
+  .filter-hint:empty { display: none; }
+
+  .filter-empty {
+    text-align: center;
+    color: #888;
+    font-size: 15px;
+    padding: 28px 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  .filter-empty b { color: #bbb; font-weight: 600; }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .set-group { margin-bottom: 30px; }
+
+  .set-header {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f0c040;
+    border-bottom: 2px solid #f0c04055;
+    padding-bottom: 6px;
+    margin-bottom: 14px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: #16213e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .2s;
+    position: relative;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .card:hover { box-shadow: 0 0 12px rgba(156,124,244,.35); }
+
+  .card.owned { border-color: #4caf50; }
+  .card.owned .status-badge { display: block; background: #4caf50; }
+  .card.ontheway { border-color: #ff9800; }
+  .card.ontheway .status-badge { display: block; background: #ff9800; }
+
+  .status-badge {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+
+  .card-img-wrap {
+    background: #0d1b36;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 10px;
+  }
+
+  .card-img-wrap img {
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: 6px;
+  }
+
+  .card-info {
+    padding: 10px 12px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-name { font-size: 15px; font-weight: bold; color: #fff; }
+
+  .card-meta {
+    font-size: 12px;
+    color: #aaa;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+
+  .card-meta b { color: #ccc; }
+
+  .rarity-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .rarity-holo       { background: #5c6bc0; }
+  .rarity-double      { background: #7b1fa2; }
+  .rarity-ir          { background: #00838f; }
+  .rarity-sar         { background: #e65100; }
+  .rarity-hr          { background: #bf360c; }
+  .rarity-ur          { background: #6a1b9a; }
+  .rarity-uncommon    { background: #558b2f; }
+  .rarity-promo       { background: #6d4c41; }
+  .rarity-common      { background: #757575; }
+  .rarity-mar         { background: #d50000; }
+  .rarity-dr          { background: #1565c0; }
+
+  .type-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .type-grass     { background: #4caf50; }
+  .type-fire      { background: #f44336; }
+  .type-water     { background: #2196f3; }
+  .type-electric  { background: #fbc02d; color: #333; }
+  .type-psychic   { background: #9c27b0; }
+  .type-fighting  { background: #a1887f; }
+  .type-dragon    { background: #7c4dff; }
+  .type-darkness  { background: #424242; }
+  .type-metal     { background: #78909c; }
+  .type-colorless { background: #78909c; }
+  .type-trainer   { background: #607d8b; }
+
+  .status-row {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid #ffffff15;
+  }
+
+  .status-btn {
+    width: 100%;
+    padding: 7px 12px;
+    border: 2px solid #555;
+    border-radius: 6px;
+    background: transparent;
+    color: #bbb;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all .15s;
+  }
+
+  .status-btn:hover { border-color: #888; color: #fff; }
+
+  .status-btn.ontheway {
+    border-color: #ff9800;
+    color: #ff9800;
+    background: #ff980015;
+  }
+
+  .status-btn.owned {
+    border-color: #4caf50;
+    color: #4caf50;
+    background: #4caf5015;
+  }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 0; font-size: 11px; }
+    .back-link { display: none; }
+    h1 { color: #000; font-size: 22px; }
+    .subtitle { color: #555; }
+    .stats-bar { display: none; }
+    .set-header { color: #000; border-color: #000; font-size: 16px; }
+
+    .card-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+    .card {
+      background: #fff;
+      border: 1.5px solid #000;
+      border-radius: 6px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .card:hover { box-shadow: none; }
+    .card.owned { display: none !important; }
+    .card-img-wrap { background: #f5f5f5; min-height: 120px; padding: 6px; }
+
+    .card-img-wrap img {
+      max-height: 170px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .card-info { padding: 6px 8px 8px; }
+    .card-name { color: #000; font-size: 12px; }
+    .card-meta { color: #333; font-size: 10px; }
+    .card-meta b { color: #000; }
+
+    .rarity-badge, .type-badge, .status-badge {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .status-btn {
+      font-size: 11px;
+      padding: 4px 8px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .set-group { break-inside: avoid; }
+    .list-filters,
+    .filter-hint { display: none !important; }
+  }
+
+  #lock-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #1a1a2e;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #lock-screen.hidden { display: none; }
+  .lock-box {
+    background: #16213e; border-radius: 16px; padding: 40px 32px;
+    text-align: center; width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  }
+  .lock-box h2 { color: #fff; margin-bottom: 8px; font-size: 22px; }
+  .lock-box p { color: #888; font-size: 13px; margin-bottom: 24px; }
+  .lock-box input {
+    width: 100%; padding: 12px 16px; border-radius: 8px; border: 2px solid #333;
+    background: #0f0f23; color: #fff; font-size: 16px; outline: none;
+    margin-bottom: 16px; text-align: center;
+  }
+  .lock-box input:focus { border-color: #9c7cf4; }
+  .lock-box button {
+    width: 100%; padding: 12px; border: none; border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+  }
+  .lock-box button:hover { opacity: .9; }
+  .lock-error { color: #ef5350; font-size: 13px; margin-top: 8px; min-height: 20px; }
+  @media print { #lock-screen { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div id="lock-screen">
+  <div class="lock-box">
+    <h2>&#128274; Private Collection</h2>
+    <p>Enter the password to view this page</p>
+    <input type="password" id="lock-pw" placeholder="Password" autofocus>
+    <button id="lock-btn">Unlock</button>
+    <div class="lock-error" id="lock-err"></div>
+  </div>
+</div>
+
+<div id="app-content" style="display:none">
+<a class="back-link" href="index.html">&larr; Back to Dashboard</a>
+<h1>Cosmos Holos</h1>
+<p class="subtitle">Cosmos holo card collection &mdash; <span id="date-str"></span></p>
+<div class="stats-bar">Collected: <span id="count-owned">0</span> / <span id="count-total">0</span></div>
+<div class="stats-detail" id="stats-detail"></div>
+<div class="sync-note" id="sync-note"></div>
+
+<div class="filters-stack list-filters">
+  <div class="filters-bar" role="toolbar" aria-label="Cosmos Holos filters">
+    <div class="seg-wrap" id="status-seg" style="--seg-count: 4; --seg-index: 0" role="group" aria-label="Filter by status">
+      <div class="seg-slider" aria-hidden="true"></div>
+      <div class="seg-track">
+        <button type="button" class="seg-btn active" data-status="all" data-seg-index="0">All</button>
+        <button type="button" class="seg-btn" data-status="missing" data-seg-index="1">Not yet</button>
+        <button type="button" class="seg-btn" data-status="ontheway" data-seg-index="2">On the way</button>
+        <button type="button" class="seg-btn" data-status="owned" data-seg-index="3">Owned</button>
+      </div>
+    </div>
+    <div class="set-dropdown-wrap">
+      <label class="visually-hidden" for="filter-set">Set</label>
+      <select id="filter-set" class="filter-set-select" aria-label="Filter by set"></select>
+    </div>
+  </div>
+  <div class="filter-search-row">
+    <label class="visually-hidden" for="filter-name">Search by card name</label>
+    <input type="search" id="filter-name" class="filter-name-input" placeholder="Search by card name…" autocomplete="off" spellcheck="false">
+  </div>
+</div>
+<p class="filter-hint" id="filter-hint" aria-live="polite"></p>
+
+<div id="card-list"></div>
+
+<script src="js/collection-progress.js"></script>
+<script src="js/scroll-to-top.js"></script>
+<script>
+const CARDS = [
+  // ---- Mega Promos (007, 008, 018, 019, 069) ----
+  { name: "Psyduck", number: "007", setTotal: null, set: "Mega Promos", setSlug: "megapromos", rarity: "Promo", rarityClass: "promo", type: "Water", hp: 70, weakness: "Electric", retreat: 1 },
+  { name: "Golduck", number: "008", setTotal: null, set: "Mega Promos", setSlug: "megapromos", rarity: "Promo", rarityClass: "promo", type: "Water", hp: 120, weakness: "Electric", retreat: 1 },
+  { name: "Cottonee", number: "018", setTotal: null, set: "Mega Promos", setSlug: "megapromos", rarity: "Promo", rarityClass: "promo", type: "Psychic", hp: 60, weakness: "Metal", retreat: 1 },
+  { name: "Whimsicott", number: "019", setTotal: null, set: "Mega Promos", setSlug: "megapromos", rarity: "Promo", rarityClass: "promo", type: "Psychic", hp: 90, weakness: "Metal", retreat: 1 },
+  { name: "Chikorita", number: "069", setTotal: null, set: "Mega Promos", setSlug: "megapromos", rarity: "Promo", rarityClass: "promo", type: "Grass", hp: 70, weakness: "Fire", retreat: 1 },
+  // ---- Mega Evolution (058) ----
+  { name: "Ralts", number: "058", setTotal: "132", set: "Mega Evolution", setSlug: "megaevolution", rarity: "Common", rarityClass: "common", type: "Psychic", hp: 70, weakness: "Darkness", retreat: 1 },
+  // ---- SV Promos (167, 168, 169) ----
+  { name: "Flareon", number: "167", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Fire", hp: 130, weakness: "Water", retreat: 2 },
+  { name: "Vaporeon", number: "168", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Water", hp: 130, weakness: "Electric", retreat: 2 },
+  { name: "Jolteon", number: "169", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Electric", hp: 110, weakness: "Fighting", retreat: 0 },
+];
+
+function getImgUrl(c) {
+  const num = parseInt(c.number, 10);
+  return `https://www.serebii.net/card/${c.setSlug}/${num}.jpg`;
+}
+
+function cardId(c) {
+  return `${c.setSlug}-${c.number}`;
+}
+
+const LIST_ID = "cosmosholos";
+let progressMap = {};
+
+/** @type {"all"|"missing"|"ontheway"|"owned"} */
+let filterStatus = "all";
+/** @type {string} empty = all sets */
+let filterSet = "";
+let filterNameQuery = "";
+
+const STATUS_SEG_ORDER = ["all", "missing", "ontheway", "owned"];
+
+function nameSearchActive() {
+  return filterNameQuery.trim().length > 0;
+}
+
+function getCardState(c, owned) {
+  const cid = cardId(c);
+  const v = owned[cid];
+  if (v === true || v === "owned") return "owned";
+  if (v === "ontheway") return "ontheway";
+  return "missing";
+}
+
+function cardMatchesFilters(c, owned) {
+  const q = filterNameQuery.trim().toLowerCase();
+  if (q && !c.name.toLowerCase().includes(q)) return false;
+  if (filterSet && c.set !== filterSet) return false;
+  if (filterStatus === "all") return true;
+  return getCardState(c, owned) === filterStatus;
+}
+
+function populateSetFilter() {
+  const sel = document.getElementById("filter-set");
+  if (!sel) return;
+  const sets = [...new Set(CARDS.map((c) => c.set))].sort((a, b) => a.localeCompare(b));
+  sel.innerHTML =
+    '<option value="">All sets</option>' +
+    sets
+      .map((s) => {
+        const escAttr = s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+        const escText = s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return `<option value="${escAttr}">${escText}</option>`;
+      })
+      .join("");
+  sel.value = filterSet;
+}
+
+function updateStatusSegmentUI() {
+  const wrap = document.getElementById("status-seg");
+  if (!wrap) return;
+  const idx = STATUS_SEG_ORDER.indexOf(filterStatus);
+  wrap.style.setProperty("--seg-index", String(idx < 0 ? 0 : idx));
+  wrap.querySelectorAll(".seg-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.status === filterStatus);
+  });
+}
+
+function updateFilterHint(visibleCount) {
+  const el = document.getElementById("filter-hint");
+  if (!el) return;
+  const total = CARDS.length;
+  if (visibleCount === total && !filterSet && filterStatus === "all" && !nameSearchActive()) {
+    el.textContent = "";
+    return;
+  }
+  el.textContent = `Showing ${visibleCount} of ${total} cards`;
+}
+
+function initListFilters() {
+  populateSetFilter();
+  updateStatusSegmentUI();
+
+  const seg = document.getElementById("status-seg");
+  if (seg) {
+    seg.querySelectorAll(".seg-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterStatus = /** @type {typeof filterStatus} */ (btn.dataset.status || "all");
+        updateStatusSegmentUI();
+        render();
+      });
+    });
+  }
+
+  const setSel = document.getElementById("filter-set");
+  if (setSel) {
+    setSel.addEventListener("change", () => {
+      filterSet = setSel.value || "";
+      render();
+    });
+  }
+
+  const nameIn = document.getElementById("filter-name");
+  if (nameIn) {
+    nameIn.addEventListener("input", () => {
+      filterNameQuery = nameIn.value;
+      render();
+    });
+  }
+}
+
+function loadOwned() {
+  return progressMap;
+}
+
+function setSyncNote(msg, color) {
+  const el = document.getElementById("sync-note");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.style.color = color || "#777";
+}
+
+function canSaveProgressFiles() {
+  const h = location.hostname;
+  return h === "127.0.0.1" || h === "localhost";
+}
+
+function envHint() {
+  if (canSaveProgressFiles()) {
+    setSyncNote(
+      "Local server: clicks save to progress/cosmosholos.json. Commit and push so GitHub Pages picks up changes.",
+      "#9c7cf4"
+    );
+  } else if (location.protocol === "file:") {
+    setSyncNote(
+      "Opened as a file: the browser cannot write into progress/cosmosholos.json. Run npm run local and open http://127.0.0.1:8765/cosmos-holos.html to save changes you can commit.",
+      "#ffb74d"
+    );
+  } else {
+    setSyncNote(
+      "Published copy: data comes from progress/cosmosholos.json in the repo. You can click cards to preview in this tab only\u2014refresh restores the site; nothing here changes Git or your files.",
+      "#888"
+    );
+  }
+}
+
+async function pullProgress() {
+  progressMap = await PokeProgress.loadListProgress(LIST_ID);
+}
+
+async function persistProgress() {
+  if (!canSaveProgressFiles()) return;
+  const ok = await PokeProgress.saveListProgress(LIST_ID, progressMap);
+  if (ok) {
+    setSyncNote("Saved to progress/cosmosholos.json \u2014 commit and push when you are ready.", "#81c784");
+  } else {
+    setSyncNote("Could not write the file. Start the local server: npm run local \u2014 then open http://127.0.0.1:8765/cosmos-holos.html", "#ffb74d");
+  }
+}
+
+function updateCount() {
+  const total = CARDS.length;
+  const c = PokeProgress.countFromMap(progressMap, total);
+  document.getElementById("count-owned").textContent = c.owned;
+  document.getElementById("count-total").textContent = total;
+  const det = document.getElementById("stats-detail");
+  if (det) {
+    det.innerHTML =
+      "<b>Owned:</b> " + c.owned +
+      " &nbsp;|&nbsp; <b>On the way:</b> " + c.ontheway +
+      " &nbsp;|&nbsp; <b>Not yet:</b> " + c.missing;
+  }
+}
+
+function render() {
+  const owned = loadOwned();
+  const container = document.getElementById("card-list");
+
+  const grouped = {};
+  let visibleCount = 0;
+  CARDS.forEach((c, i) => {
+    if (!cardMatchesFilters(c, owned)) return;
+    visibleCount++;
+    if (!grouped[c.set]) grouped[c.set] = [];
+    grouped[c.set].push({ ...c, _i: i });
+  });
+
+  updateFilterHint(visibleCount);
+
+  let html = "";
+  for (const [setName, cards] of Object.entries(grouped)) {
+    html += `<div class="set-group">`;
+    html += `<div class="set-header">${setName}</div>`;
+    html += `<div class="card-grid">`;
+    for (const c of cards) {
+      const cid = cardId(c);
+      const state = owned[cid] === true ? "owned" : (owned[cid] || "");
+      const cardClass = state === "owned" ? "owned" : state === "ontheway" ? "ontheway" : "";
+      const badgeText = state === "owned" ? "OWNED" : state === "ontheway" ? "ON THE WAY" : "";
+      const btnClass = state === "owned" ? "owned" : state === "ontheway" ? "ontheway" : "";
+      const btnText = state === "owned" ? "&#10003; Owned" : state === "ontheway" ? "&#128230; On the way" : "&#9744; Don't have yet";
+      const numberStr = c.setTotal ? `${parseInt(c.number,10)} / ${c.setTotal}` : `#${parseInt(c.number,10)}`;
+      const hpStr = c.hp ? `<span><b>HP:</b> ${c.hp}</span>` : "";
+      const weakStr = c.weakness && c.weakness !== "None" ? `<span><b>Weak:</b> ${c.weakness}</span>` : "";
+      html += `
+        <div class="card ${cardClass}" id="card-${cid}">
+          <div class="status-badge">${badgeText}</div>
+          <div class="card-img-wrap">
+            <img src="${getImgUrl(c)}" alt="${c.name}" loading="lazy"
+                 onerror="this.onerror=null;this.alt='Image not available';">
+          </div>
+          <div class="card-info">
+            <div class="card-name">${c.name}</div>
+            <div class="card-meta">
+              <span><b>Set:</b> ${c.set}</span>
+              <span><b>#</b> ${numberStr}</span>
+              ${hpStr}
+            </div>
+            <div class="card-meta">
+              <span class="type-badge type-${c.type.toLowerCase()}">${c.type}</span>
+              <span class="rarity-badge rarity-${c.rarityClass}">${c.rarity}</span>
+              ${weakStr}
+            </div>
+            <div class="status-row">
+              <button class="status-btn ${btnClass}" onclick="cycleState('${cid}')">${btnText}</button>
+            </div>
+          </div>
+        </div>`;
+    }
+    html += `</div></div>`;
+  }
+  if (!html) {
+    html =
+      '<p class="filter-empty">No cards match these filters. Try clearing the search box, <b>All</b> for status, or <b>All sets</b>.</p>';
+  }
+  container.innerHTML = html;
+  updateCount();
+}
+
+async function cycleState(cid) {
+  const owned = loadOwned();
+  const cur = owned[cid] === true ? "owned" : (owned[cid] || "");
+  const next = cur === "" ? "ontheway" : cur === "ontheway" ? "owned" : "";
+  if (next) owned[cid] = next; else delete owned[cid];
+  if (canSaveProgressFiles()) await persistProgress();
+
+  const el = document.getElementById(`card-${cid}`);
+  if (!el) return;
+  el.classList.remove("owned", "ontheway");
+  if (next) el.classList.add(next);
+
+  const badge = el.querySelector(".status-badge");
+  badge.textContent = next === "owned" ? "OWNED" : next === "ontheway" ? "ON THE WAY" : "";
+  badge.style.display = next ? "block" : "none";
+
+  const btn = el.querySelector(".status-btn");
+  btn.className = "status-btn" + (next ? " " + next : "");
+  btn.innerHTML = next === "owned" ? "&#10003; Owned" : next === "ontheway" ? "&#128230; On the way" : "&#9744; Don't have yet";
+
+  updateCount();
+
+  const filtersActive = filterStatus !== "all" || !!filterSet || nameSearchActive();
+  if (filtersActive) render();
+}
+
+document.getElementById("date-str").textContent = new Date().toLocaleDateString("en-US", {
+  year: "numeric", month: "long", day: "numeric"
+});
+
+(async function boot() {
+  await pullProgress();
+  envHint();
+  initListFilters();
+  render();
+})();
+</script>
+</div>
+
+<script>
+const HASH = "cdb1b5a8f8ddb270135b9d7b27cdf57e5e346d92b53d2bdc595a50b26029ab32";
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(msg));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
+async function unlock() {
+  const pw = document.getElementById("lock-pw").value;
+  if ((await sha256(pw)) === HASH) {
+    sessionStorage.setItem("poke-auth", "1");
+    document.getElementById("lock-screen").classList.add("hidden");
+    document.getElementById("app-content").style.display = "";
+  } else {
+    document.getElementById("lock-err").textContent = "Wrong password";
+  }
+}
+if (sessionStorage.getItem("poke-auth") === "1") {
+  document.getElementById("lock-screen").classList.add("hidden");
+  document.getElementById("app-content").style.display = "";
+}
+document.getElementById("lock-btn").addEventListener("click", unlock);
+document.getElementById("lock-pw").addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+</script>
+</body>
+</html>

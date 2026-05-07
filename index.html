@@ -217,6 +217,9 @@
   .wishlist-accent { color: #e8a0e8; }
   .wishlist-accent .icon { background: #e8a0e822; color: #e8a0e8; }
 
+  .cosmosholos-accent { color: #9c7cf4; }
+  .cosmosholos-accent .icon { background: #9c7cf422; color: #9c7cf4; }
+
   .list-meta {
     font-size: 13px;
     color: #888;
@@ -298,6 +301,7 @@
 
   .ogerpon-accent .list-link { background: #7ec8e3; color: #0d1b36; }
   .wishlist-accent .list-link { background: #e8a0e8; color: #1a1a2e; }
+  .cosmosholos-accent .list-link { background: #9c7cf4; color: #1a1a2e; }
 
   @media print {
     body { background: #fff; color: #000; padding: 10px; }
@@ -437,19 +441,19 @@
   <div class="list-card wishlist-accent">
     <h3><span class="icon">&#11088;</span> Wishlist</h3>
     <div class="list-meta">
-      <span>50 cards</span>
+      <span id="wishlist-meta-cards">79 cards</span>
       <span>Many sets</span>
       <span>Mixed Pok&eacute;mon &amp; Trainers</span>
     </div>
     <div class="list-breakdown" id="wishlist-breakdown">
       <span><b>Owned:</b> <span id="wishlist-bc-owned">0</span></span>
       <span><b>On the way:</b> <span id="wishlist-bc-way">0</span></span>
-      <span><b>Not yet:</b> <span id="wishlist-bc-none">50</span></span>
+      <span><b>Not yet:</b> <span id="wishlist-bc-none">79</span></span>
     </div>
     <div class="list-stats">
       <div>
         <div class="list-stat-num" id="wishlist-owned" style="color:#e8a0e8">0</div>
-        <div class="stat-label">owned of 50</div>
+        <div class="stat-label" id="wishlist-owned-of">owned of 79</div>
       </div>
       <div class="list-progress-wrap">
         <div class="list-progress-bar">
@@ -459,6 +463,32 @@
       </div>
     </div>
     <a class="list-link" href="wishlist.html">Open Wishlist &rarr;</a>
+  </div>
+
+  <div class="list-card cosmosholos-accent">
+    <h3><span class="icon">&#10024;</span> Cosmos Holos</h3>
+    <div class="list-meta">
+      <span id="cosmosholos-meta-cards">9 cards</span>
+      <span>Holo collection</span>
+    </div>
+    <div class="list-breakdown" id="cosmosholos-breakdown">
+      <span><b>Owned:</b> <span id="cosmosholos-bc-owned">0</span></span>
+      <span><b>On the way:</b> <span id="cosmosholos-bc-way">0</span></span>
+      <span><b>Not yet:</b> <span id="cosmosholos-bc-none">9</span></span>
+    </div>
+    <div class="list-stats">
+      <div>
+        <div class="list-stat-num" id="cosmosholos-owned" style="color:#9c7cf4">0</div>
+        <div class="stat-label" id="cosmosholos-owned-of">owned of 9</div>
+      </div>
+      <div class="list-progress-wrap">
+        <div class="list-progress-bar">
+          <div class="list-progress-fill" id="cosmosholos-bar" style="width:0;background:#9c7cf4"></div>
+        </div>
+        <div class="list-progress-pct" id="cosmosholos-pct">0%</div>
+      </div>
+    </div>
+    <a class="list-link" href="cosmos-holos.html">Open Cosmos Holos &rarr;</a>
   </div>
 </div>
 
@@ -474,6 +504,15 @@
     <a href="https://www.alola.cz/" target="_blank" rel="noopener noreferrer">Alola.cz</a>
     <a href="https://www.pokesov.cz/" target="_blank" rel="noopener noreferrer">Pokešov.cz</a>
     <a href="https://www.blacklotus.cz/" target="_blank" rel="noopener noreferrer">Blacklotus.cz</a>
+  </div>
+</section>
+
+<section class="refs-section" aria-labelledby="sealed-shops-heading">
+  <h2 id="sealed-shops-heading">Shops (sealed products)</h2>
+  <p class="refs-section-desc">E-shops that sell sealed Pok&eacute;mon products &mdash; booster boxes, ETBs, tins, collection boxes, and more.</p>
+  <div class="refs-buttons">
+    <a href="https://www.kartickarna.cz/pokemon" target="_blank" rel="noopener noreferrer">Karti&ccaron;k&aacute;rna.cz</a>
+    <a href="https://www.vesely-drak.cz/" target="_blank" rel="noopener noreferrer">Vesel&yacute; drak</a>
   </div>
 </section>
 
@@ -521,26 +560,57 @@ async function update() {
     }
   }
 
+  let wishlistSlots = null;
+  try {
+    const order = await loadJson("./wishlist-card-order.json");
+    let exp = { ids: [] };
+    try {
+      exp = await loadJson("./expensive-wishlist.json");
+    } catch (_) {}
+    const expSet = new Set((exp.ids || []).map(String));
+    wishlistSlots = (order.cardIds || []).map((id) => ({
+      id,
+      expensive: expSet.has(id),
+    }));
+  } catch (_) {
+    wishlistSlots = null;
+  }
+
   let totalOwned = 0;
   let totalOntheway = 0;
   let totalNone = 0;
   let totalCards = 0;
 
   for (const L of meta.lists) {
-    const c = PokeProgress.countFromMap(maps[L.id], L.total);
+    let c;
+    if (L.id === "wishlist" && wishlistSlots && wishlistSlots.length) {
+      c = PokeProgress.countFromCardSlots(maps[L.id], wishlistSlots);
+    } else {
+      c = PokeProgress.countFromMap(maps[L.id], L.total);
+    }
     totalOwned += c.owned;
     totalOntheway += c.ontheway;
     totalNone += c.missing;
-    totalCards += L.total;
+    totalCards += c.total;
 
-    const pre = L.id === "ogerpon" ? "ogerpon" : "wishlist";
+    const pre = L.id;
     document.getElementById(pre + "-owned").textContent = c.owned;
     document.getElementById(pre + "-bc-owned").textContent = c.owned;
     document.getElementById(pre + "-bc-way").textContent = c.ontheway;
     document.getElementById(pre + "-bc-none").textContent = c.missing;
-    const pct = L.total ? Math.round((c.owned / L.total) * 100) : 0;
+    const pct = c.total ? Math.round((c.owned / c.total) * 100) : 0;
     document.getElementById(pre + "-bar").style.width = pct + "%";
     document.getElementById(pre + "-pct").textContent = pct + "%";
+
+    const ownedOfEl = document.getElementById(pre + "-owned-of");
+    if (ownedOfEl) ownedOfEl.textContent = "owned of " + c.total;
+    const metaCardsEl = document.getElementById(pre + "-meta-cards");
+    if (metaCardsEl) metaCardsEl.textContent = c.total + " cards";
+
+    if (L.id === "wishlist") {
+      const n = wishlistSlots && wishlistSlots.length ? wishlistSlots.length : L.total;
+      if (metaCardsEl) metaCardsEl.textContent = n + " cards";
+    }
   }
 
   document.getElementById("total-owned").textContent = totalOwned;

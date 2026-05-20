@@ -19,43 +19,6 @@
     return { owned, ontheway, missing, total: totalCards };
   }
 
-  /**
-   * Per-slot stats for lists where some cards are "expensive": they do not count
-   * toward total / owned / on the way / not yet until marked owned or on the way.
-   * @param {Record<string, unknown>} map progress keyed by card id
-   * @param {Array<string | { id: string, expensive?: boolean }>} slots ordered card ids
-   */
-  function countFromCardSlots(map, slots) {
-    if (!slots || !slots.length) {
-      return { owned: 0, ontheway: 0, missing: 0, total: 0 };
-    }
-    const m = map || {};
-    let owned = 0;
-    let ontheway = 0;
-    let total = 0;
-    for (let i = 0; i < slots.length; i++) {
-      const slot = slots[i];
-      const id = typeof slot === "string" ? slot : slot.id;
-      const expensive = typeof slot === "object" && slot && slot.expensive;
-      const s = normalizeState(m[id]);
-      if (expensive) {
-        if (s === "owned") {
-          owned++;
-          total++;
-        } else if (s === "ontheway") {
-          ontheway++;
-          total++;
-        }
-      } else {
-        total++;
-        if (s === "owned") owned++;
-        else if (s === "ontheway") ontheway++;
-      }
-    }
-    const missing = Math.max(0, total - owned - ontheway);
-    return { owned, ontheway, missing, total };
-  }
-
   async function loadListProgress(listId) {
     const url = "./progress/" + listId + ".json";
     try {
@@ -83,7 +46,6 @@
   global.PokeProgress = {
     normalizeState,
     countFromMap,
-    countFromCardSlots,
     loadListProgress,
     saveListProgress,
   };

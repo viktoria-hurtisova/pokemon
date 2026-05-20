@@ -220,6 +220,9 @@
   .cosmosholos-accent { color: #9c7cf4; }
   .cosmosholos-accent .icon { background: #9c7cf422; color: #9c7cf4; }
 
+  .expensive-accent { color: #f0c040; }
+  .expensive-accent .icon { background: #f0c04022; color: #f0c040; }
+
   .list-meta {
     font-size: 13px;
     color: #888;
@@ -302,6 +305,7 @@
   .ogerpon-accent .list-link { background: #7ec8e3; color: #0d1b36; }
   .wishlist-accent .list-link { background: #e8a0e8; color: #1a1a2e; }
   .cosmosholos-accent .list-link { background: #9c7cf4; color: #1a1a2e; }
+  .expensive-accent .list-link { background: linear-gradient(135deg, #b8860b, #f0c040); color: #1a1a2e; }
 
   @media print {
     body { background: #fff; color: #000; padding: 10px; }
@@ -490,6 +494,33 @@
     </div>
     <a class="list-link" href="cosmos-holos.html">Open Cosmos Holos &rarr;</a>
   </div>
+
+  <div class="list-card expensive-accent">
+    <h3><span class="icon">&#128176;</span> Expensive Cards</h3>
+    <div class="list-meta">
+      <span id="expensive-meta-cards">8 cards</span>
+      <span>&gt; $100 / &euro;100 / 2500 K&ccaron;</span>
+      <span>From wishlist</span>
+    </div>
+    <div class="list-breakdown" id="expensive-breakdown">
+      <span><b>Owned:</b> <span id="expensive-bc-owned">0</span></span>
+      <span><b>On the way:</b> <span id="expensive-bc-way">0</span></span>
+      <span><b>Not yet:</b> <span id="expensive-bc-none">8</span></span>
+    </div>
+    <div class="list-stats">
+      <div>
+        <div class="list-stat-num" id="expensive-owned" style="color:#f0c040">0</div>
+        <div class="stat-label" id="expensive-owned-of">owned of 8</div>
+      </div>
+      <div class="list-progress-wrap">
+        <div class="list-progress-bar">
+          <div class="list-progress-fill" id="expensive-bar" style="width:0;background:#f0c040"></div>
+        </div>
+        <div class="list-progress-pct" id="expensive-pct">0%</div>
+      </div>
+    </div>
+    <a class="list-link" href="expensive.html">Open Expensive Cards &rarr;</a>
+  </div>
 </div>
 
 <p class="header-ref">
@@ -560,21 +591,13 @@ async function update() {
     }
   }
 
-  let wishlistSlots = null;
+  let wishlistTotal = null;
   try {
     const order = await loadJson("./wishlist-card-order.json");
-    let exp = { ids: [] };
-    try {
-      exp = await loadJson("./expensive-wishlist.json");
-    } catch (_) {}
-    const expSet = new Set((exp.ids || []).map(String));
-    wishlistSlots = (order.cardIds || []).map((id) => ({
-      id,
-      expensive: expSet.has(id),
-    }));
-  } catch (_) {
-    wishlistSlots = null;
-  }
+    if (Array.isArray(order.cardIds) && order.cardIds.length) {
+      wishlistTotal = order.cardIds.length;
+    }
+  } catch (_) {}
 
   let totalOwned = 0;
   let totalOntheway = 0;
@@ -582,12 +605,8 @@ async function update() {
   let totalCards = 0;
 
   for (const L of meta.lists) {
-    let c;
-    if (L.id === "wishlist" && wishlistSlots && wishlistSlots.length) {
-      c = PokeProgress.countFromCardSlots(maps[L.id], wishlistSlots);
-    } else {
-      c = PokeProgress.countFromMap(maps[L.id], L.total);
-    }
+    const listTotal = L.id === "wishlist" && wishlistTotal ? wishlistTotal : L.total;
+    const c = PokeProgress.countFromMap(maps[L.id], listTotal);
     totalOwned += c.owned;
     totalOntheway += c.ontheway;
     totalNone += c.missing;
@@ -606,11 +625,6 @@ async function update() {
     if (ownedOfEl) ownedOfEl.textContent = "owned of " + c.total;
     const metaCardsEl = document.getElementById(pre + "-meta-cards");
     if (metaCardsEl) metaCardsEl.textContent = c.total + " cards";
-
-    if (L.id === "wishlist") {
-      const n = wishlistSlots && wishlistSlots.length ? wishlistSlots.length : L.total;
-      if (metaCardsEl) metaCardsEl.textContent = n + " cards";
-    }
   }
 
   document.getElementById("total-owned").textContent = totalOwned;

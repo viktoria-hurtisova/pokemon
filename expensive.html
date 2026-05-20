@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expensive Cards - Pok&eacute;mon Card Checklist</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    color: #7ec8e3;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 6px;
+    color: #f0c040;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .threshold-note {
+    text-align: center;
+    font-size: 13px;
+    color: #b08d3a;
+    margin-bottom: 16px;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+    background: #2a2418;
+    border: 1px solid #5a4a20;
+    border-radius: 8px;
+    padding: 10px 14px;
+    line-height: 1.45;
+  }
+
+  .stats-bar {
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 15px;
+    color: #aaa;
+  }
+
+  .stats-bar span {
+    font-weight: bold;
+    color: #f0c040;
+  }
+
+  .stats-detail {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #888;
+  }
+
+  .stats-detail b { color: #bbb; font-weight: 600; }
+
+  .total-value {
+    text-align: center;
+    font-size: 13px;
+    color: #b08d3a;
+    margin-bottom: 18px;
+  }
+  .total-value b { color: #f0c040; }
+
+  .sync-note {
+    text-align: center;
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .filters-stack {
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 22px;
+  }
+
+  .filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px 14px;
+  }
+
+  .seg-wrap {
+    --seg-count: 4;
+    --seg-index: 0;
+    position: relative;
+    display: inline-flex;
+    flex: 1 1 280px;
+    max-width: 520px;
+    min-width: min(100%, 280px);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid #3d3d55;
+    background: #222338;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .seg-slider {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc((100% - 8px) / var(--seg-count));
+    border-radius: 999px;
+    background: #4a4a62;
+    box-shadow: 0 1px 2px rgba(0,0,0,.25);
+    z-index: 0;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(calc(var(--seg-index) * 100%));
+    pointer-events: none;
+  }
+
+  .seg-track {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    width: 100%;
+  }
+
+  .seg-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 9px 8px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: #b0b0c8;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .seg-btn:hover { color: #e8e8f0; }
+  .seg-btn.active { color: #fff; }
+
+  .sort-wrap { flex: 0 0 auto; position: relative; }
+
+  .filter-set-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 10px 36px 10px 16px;
+    border-radius: 999px;
+    border: 1px solid #3d3d55;
+    background: #222338 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b0b0c8' d='M2.5 4.5L6 8l3.5-3.5' stroke='%23b0b0c8' stroke-width='1.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+    color: #e0e0e8;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 160px;
+    max-width: min(100vw - 40px, 280px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .filter-set-select:hover { border-color: #55556e; color: #fff; }
+  .filter-set-select:focus {
+    outline: none;
+    border-color: #f0c040;
+    box-shadow: 0 0 0 2px rgba(240,192,64,.25);
+  }
+
+  .filter-hint {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    margin-top: -12px;
+    margin-bottom: 18px;
+  }
+  .filter-hint:empty { display: none; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: #16213e;
+    border: 1px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .2s;
+    position: relative;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .card:hover { box-shadow: 0 0 12px rgba(240,192,64,.35); }
+
+  .card.owned { border-color: #4caf50; }
+  .card.owned .status-badge { display: block; background: #4caf50; }
+  .card.ontheway { border-color: #ff9800; }
+  .card.ontheway .status-badge { display: block; background: #ff9800; }
+
+  .status-badge {
+    display: none;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+
+  .price-tag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: linear-gradient(135deg, #b8860b, #f0c040);
+    color: #1a1a2e;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.4);
+    z-index: 2;
+  }
+
+  .card-img-wrap {
+    background: #0d1b36;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    padding: 10px;
+  }
+
+  .card-img-wrap img {
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: 6px;
+  }
+
+  .card-info {
+    padding: 10px 12px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-name { font-size: 15px; font-weight: bold; color: #fff; }
+
+  .card-meta {
+    font-size: 12px;
+    color: #aaa;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+  .card-meta b { color: #ccc; }
+
+  .price-row {
+    background: #2a2418;
+    border: 1px solid #5a4a20;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #b08d3a;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 10px;
+  }
+
+  .price-row b { color: #f0c040; font-weight: 700; }
+  .price-row .price-cell { text-align: right; color: #ddc890; font-weight: 600; }
+
+  .price-links {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .price-links a {
+    flex: 1 1 auto;
+    text-align: center;
+    background: #3a2f18;
+    border: 1px solid #5a4a20;
+    color: #f0c040;
+    text-decoration: none;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: background .15s, border-color .15s;
+  }
+  .price-links a:hover { background: #4a3c20; border-color: #806020; }
+
+  .rarity-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .rarity-sar   { background: #e65100; }
+  .rarity-ir    { background: #00838f; }
+  .rarity-holo  { background: #5c6bc0; }
+  .rarity-ur    { background: #6a1b9a; }
+  .rarity-uncommon { background: #558b2f; }
+  .rarity-promo { background: #b71c1c; }
+  .rarity-mar   { background: #d50000; }
+  .rarity-dr    { background: #1565c0; }
+  .rarity-common { background: #757575; }
+
+  .type-badge {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .type-grass     { background: #4caf50; }
+  .type-fire      { background: #f44336; }
+  .type-water     { background: #2196f3; }
+  .type-electric  { background: #fbc02d; color: #333; }
+  .type-psychic   { background: #9c27b0; }
+  .type-fighting  { background: #a1887f; }
+  .type-dragon    { background: #7c4dff; }
+  .type-darkness  { background: #424242; }
+  .type-metal     { background: #78909c; }
+  .type-colorless { background: #78909c; }
+  .type-trainer   { background: #607d8b; }
+  .type-fairy     { background: #ec4899; }
+
+  .status-row {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid #ffffff15;
+  }
+
+  .status-btn {
+    width: 100%;
+    padding: 7px 12px;
+    border: 2px solid #555;
+    border-radius: 6px;
+    background: transparent;
+    color: #bbb;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all .15s;
+  }
+
+  .status-btn:hover { border-color: #888; color: #fff; }
+
+  .status-btn.ontheway {
+    border-color: #ff9800;
+    color: #ff9800;
+    background: #ff980015;
+  }
+
+  .status-btn.owned {
+    border-color: #4caf50;
+    color: #4caf50;
+    background: #4caf5015;
+  }
+
+  .filter-empty {
+    text-align: center;
+    color: #888;
+    font-size: 15px;
+    padding: 28px 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+  .filter-empty b { color: #bbb; font-weight: 600; }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 0; font-size: 11px; }
+    .back-link { display: none; }
+    h1 { color: #000; font-size: 22px; }
+    .subtitle { color: #555; }
+    .threshold-note { background: #fff8e0; border-color: #aa8030; color: #604010; }
+    .stats-bar { display: none; }
+    .card-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .card { background: #fff; border: 1.5px solid #000; border-radius: 6px; }
+    .card:hover { box-shadow: none; }
+    .card-img-wrap { background: #f5f5f5; min-height: 120px; padding: 6px; }
+    .card-img-wrap img {
+      max-height: 170px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .card-info { padding: 6px 8px 8px; }
+    .card-name { color: #000; font-size: 12px; }
+    .card-meta { color: #333; font-size: 10px; }
+    .card-meta b { color: #000; }
+    .price-row { background: #fff8e0; border-color: #aa8030; color: #604010; font-size: 10px; }
+    .price-row b { color: #604010; }
+    .price-row .price-cell { color: #604010; }
+    .price-links a {
+      background: #fff;
+      border: 1px solid #aa8030;
+      color: #604010;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .price-tag {
+      background: #f0c040 !important;
+      color: #000 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .rarity-badge, .type-badge, .status-badge {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .status-btn {
+      font-size: 11px;
+      padding: 4px 8px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .filters-stack,
+    .filter-hint { display: none !important; }
+  }
+
+  #lock-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #1a1a2e;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #lock-screen.hidden { display: none; }
+  .lock-box {
+    background: #16213e; border-radius: 16px; padding: 40px 32px;
+    text-align: center; width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  }
+  .lock-box h2 { color: #fff; margin-bottom: 8px; font-size: 22px; }
+  .lock-box p { color: #888; font-size: 13px; margin-bottom: 24px; }
+  .lock-box input {
+    width: 100%; padding: 12px 16px; border-radius: 8px; border: 2px solid #333;
+    background: #0f0f23; color: #fff; font-size: 16px; outline: none;
+    margin-bottom: 16px; text-align: center;
+  }
+  .lock-box input:focus { border-color: #f0c040; }
+  .lock-box button {
+    width: 100%; padding: 12px; border: none; border-radius: 8px;
+    background: linear-gradient(135deg, #b8860b, #f0c040); color: #1a1a2e;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .lock-box button:hover { opacity: .9; }
+  .lock-error { color: #ef5350; font-size: 13px; margin-top: 8px; min-height: 20px; }
+  @media print { #lock-screen { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div id="lock-screen">
+  <div class="lock-box">
+    <h2>&#128274; Private Collection</h2>
+    <p>Enter the password to view this page</p>
+    <input type="password" id="lock-pw" placeholder="Password" autofocus>
+    <button id="lock-btn">Unlock</button>
+    <div class="lock-error" id="lock-err"></div>
+  </div>
+</div>
+
+<div id="app-content" style="display:none">
+<a class="back-link" href="index.html">&larr; Back to Dashboard</a>
+<h1>&#128176; Expensive Cards</h1>
+<p class="subtitle">Wishlist cards over <b>$100 / &euro;100 / 2500 K&ccaron;</b> &mdash; <span id="date-str"></span></p>
+
+<div class="threshold-note">
+  These are wishlist cards you do not own yet whose <b>ungraded (raw) market price exceeds the threshold</b>.
+  Prices are sourced from <a href="https://www.pricecharting.com/" target="_blank" rel="noopener" style="color:#f0c040">PriceCharting.com</a>
+  (eBay sold-listing averages) and cross-checked with
+  <a href="https://www.tcgplayer.com/" target="_blank" rel="noopener" style="color:#f0c040">TCGPlayer.com</a>.
+  Conversions use <b>$1 &asymp; 22.5 K&ccaron; &asymp; &euro;0.92</b> (May 2026). Click the links on each card for the latest live price.
+</div>
+
+<div class="stats-bar">Collected: <span id="count-owned">0</span> / <span id="count-total">0</span></div>
+<div class="stats-detail" id="stats-detail"></div>
+<div class="total-value" id="total-value"></div>
+<div class="sync-note" id="sync-note"></div>
+
+<div class="filters-stack">
+  <div class="filters-bar" role="toolbar" aria-label="Expensive cards filters">
+    <div class="seg-wrap" id="status-seg" style="--seg-count: 4; --seg-index: 0" role="group" aria-label="Filter by status">
+      <div class="seg-slider" aria-hidden="true"></div>
+      <div class="seg-track">
+        <button type="button" class="seg-btn active" data-status="all" data-seg-index="0">All</button>
+        <button type="button" class="seg-btn" data-status="missing" data-seg-index="1">Not yet</button>
+        <button type="button" class="seg-btn" data-status="ontheway" data-seg-index="2">On the way</button>
+        <button type="button" class="seg-btn" data-status="owned" data-seg-index="3">Owned</button>
+      </div>
+    </div>
+    <div class="sort-wrap">
+      <label class="visually-hidden" for="filter-sort">Sort</label>
+      <select id="filter-sort" class="filter-set-select" aria-label="Sort cards">
+        <option value="price-desc">Price: high to low</option>
+        <option value="price-asc">Price: low to high</option>
+        <option value="name">Name (A&ndash;Z)</option>
+        <option value="set">Set</option>
+      </select>
+    </div>
+  </div>
+</div>
+<p class="filter-hint" id="filter-hint" aria-live="polite"></p>
+
+<div id="card-list" class="card-grid"></div>
+
+<script src="js/collection-progress.js"></script>
+<script src="js/scroll-to-top.js"></script>
+<script>
+const USD_TO_CZK = 22.5;
+const USD_TO_EUR = 0.92;
+
+const CARDS = [
+  {
+    name: "Gengar EX (Full Art)",
+    number: "114",
+    setTotal: "119",
+    set: "Phantom Forces",
+    setSlug: "phantomforces",
+    rarity: "Ultra Rare",
+    rarityClass: "ur",
+    type: "Psychic",
+    hp: 170,
+    weakness: "Darkness",
+    retreat: 2,
+    priceUsd: 400.00,
+    priceTcgUsd: 459.06,
+    pricechartingUrl: "https://www.pricecharting.com/game/pokemon-phantom-forces/gengar-ex-114",
+    tcgplayerUrl: "https://www.tcgplayer.com/search/pokemon/phantom-forces?q=Gengar+EX&view=grid"
+  },
+  {
+    name: "Sylveon V (Alt Art)",
+    number: "184",
+    setTotal: "225",
+    set: "Evolving Skies",
+    setSlug: "evolvingskies",
+    rarity: "Ultra Rare",
+    rarityClass: "ur",
+    type: "Psychic",
+    hp: 200,
+    weakness: "Metal",
+    retreat: 1,
+    priceUsd: 126.02,
+    priceTcgUsd: 149.76,
+    pricechartingUrl: "https://www.pricecharting.com/game/pokemon-evolving-skies/sylveon-v-184",
+    tcgplayerUrl: "https://www.tcgplayer.com/search/pokemon/evolving-skies?q=Sylveon+V+184&view=grid"
+  },
+  {
+    name: "Moltres & Zapdos & Articuno GX",
+    number: "210",
+    setTotal: null,
+    set: "SM Promos",
+    setSlug: "smpromos",
+    rarity: "Ultra Rare",
+    rarityClass: "ur",
+    type: "Colorless",
+    hp: 300,
+    weakness: "Electric",
+    retreat: 3,
+    displayNum: "SM210",
+    priceUsd: 151.25,
+    priceTcgUsd: 171.99,
+    pricechartingUrl: "https://www.pricecharting.com/game/pokemon-promo/moltres-zapdos-and-articuno-gx-sm210",
+    tcgplayerUrl: "https://www.tcgplayer.com/search/pokemon/product?q=Moltres+Zapdos+Articuno+GX+SM210&view=grid"
+  },
+  {
+    name: "Sylveon ex",
+    number: "212",
+    setTotal: "187",
+    set: "Terastal Festival ex",
+    setSlug: "terastalfestivalex",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Psychic",
+    hp: 270,
+    weakness: "Metal",
+    retreat: 2,
+    priceUsd: 144.00,
+    priceTcgUsd: null,
+    pricechartingUrl: "https://www.pricecharting.com/game/pokemon-japanese-terastal-festival/sylveon-ex-212",
+    tcgplayerUrl: "https://www.tcgplayer.com/search/pokemon/product?q=Sylveon+ex+Terastal+Festival+212&view=grid"
+  },
+  {
+    name: "Venusaur ex",
+    number: "198",
+    setTotal: "165",
+    set: "Pokemon Card 151",
+    setSlug: "151",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Grass",
+    hp: 340,
+    weakness: "Fire",
+    retreat: 4,
+    priceUsd: 115.00,
+    priceTcgUsd: 139.50,
+    pricechartingUrl: "https://www.pricecharting.com/game/pokemon-scarlet-&-violet-151/venusaur-ex-198",
+    tcgplayerUrl: "https://www.tcgplayer.com/search/pokemon/scarlet-and-violet-151?q=Venusaur+ex+198&view=grid"
+  },
+  {
+    name: "Pikachu ex",
+    number: "277",
+    setTotal: "217",
+    set: "Ascended Heroes",
+    setSlug: "ascendedheroes",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Electric",
+    hp: 200,
+    weakness: "Fighting",
+    retreat: 1,
+    priceUsd: 507.59,
+    priceTcgUsd: 483.66,
+    pricechartingUrl: "https://www.pricecharting.com/game/pokemon-ascended-heroes/pikachu-ex-277",
+    tcgplayerUrl: "https://www.tcgplayer.com/search/pokemon/product?q=Pikachu+ex+Ascended+Heroes+277&view=grid"
+  },
+  {
+    name: "Mega Venusaur ex",
+    number: "177",
+    setTotal: "132",
+    set: "Mega Evolution",
+    setSlug: "megaevolution",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Grass",
+    hp: 380,
+    weakness: "Fire",
+    retreat: 4,
+    priceUsd: 142.50,
+    priceTcgUsd: 155.13,
+    pricechartingUrl: "https://www.pricecharting.com/game/pokemon-mega-evolution/mega-venusaur-ex-177",
+    tcgplayerUrl: "https://www.tcgplayer.com/search/pokemon/product?q=Mega+Venusaur+ex+Mega+Evolution+177&view=grid"
+  },
+  {
+    name: "Lillie's Clefairy ex",
+    number: "184",
+    setTotal: "159",
+    set: "Journey Together",
+    setSlug: "journeytogether",
+    rarity: "Special Art Rare",
+    rarityClass: "sar",
+    type: "Psychic",
+    hp: 190,
+    weakness: "Metal",
+    retreat: 2,
+    priceUsd: 115.00,
+    priceTcgUsd: 129.94,
+    pricechartingUrl: "https://www.pricecharting.com/game/pokemon-journey-together/lillies-clefairy-ex-184",
+    tcgplayerUrl: "https://www.tcgplayer.com/search/pokemon/journey-together?q=Lillie+Clefairy+ex+184&view=grid"
+  }
+];
+
+function getImgUrl(c) {
+  if (c.number.startsWith("h")) return `https://www.serebii.net/card/${c.setSlug}/${c.number}.jpg`;
+  return `https://www.serebii.net/card/${c.setSlug}/${parseInt(c.number, 10)}.jpg`;
+}
+
+function cardId(c) { return `${c.setSlug}-${c.number}`; }
+
+function formatUsd(v) {
+  return "$" + v.toFixed(2);
+}
+function formatCzk(usd) {
+  const czk = usd * USD_TO_CZK;
+  return Math.round(czk).toLocaleString("cs-CZ") + " K\u010d";
+}
+function formatEur(usd) {
+  const eur = usd * USD_TO_EUR;
+  return "\u20ac" + eur.toFixed(2);
+}
+
+const LIST_ID = "expensive";
+let progressMap = {};
+
+/** @type {"all"|"missing"|"ontheway"|"owned"} */
+let filterStatus = "all";
+/** @type {"price-desc"|"price-asc"|"name"|"set"} */
+let sortMode = "price-desc";
+
+const STATUS_SEG_ORDER = ["all", "missing", "ontheway", "owned"];
+
+function getCardState(c, owned) {
+  const cid = cardId(c);
+  const v = owned[cid];
+  if (v === true || v === "owned") return "owned";
+  if (v === "ontheway") return "ontheway";
+  return "missing";
+}
+
+function cardMatchesFilters(c, owned) {
+  if (filterStatus === "all") return true;
+  return getCardState(c, owned) === filterStatus;
+}
+
+function sortedCards(cards) {
+  const arr = cards.slice();
+  if (sortMode === "price-desc") arr.sort((a, b) => (b.priceUsd || 0) - (a.priceUsd || 0));
+  else if (sortMode === "price-asc") arr.sort((a, b) => (a.priceUsd || 0) - (b.priceUsd || 0));
+  else if (sortMode === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
+  else if (sortMode === "set") arr.sort((a, b) => a.set.localeCompare(b.set) || (b.priceUsd || 0) - (a.priceUsd || 0));
+  return arr;
+}
+
+function updateStatusSegmentUI() {
+  const wrap = document.getElementById("status-seg");
+  if (!wrap) return;
+  const idx = STATUS_SEG_ORDER.indexOf(filterStatus);
+  wrap.style.setProperty("--seg-index", String(idx < 0 ? 0 : idx));
+  wrap.querySelectorAll(".seg-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.status === filterStatus);
+  });
+}
+
+function updateFilterHint(visibleCount) {
+  const el = document.getElementById("filter-hint");
+  if (!el) return;
+  const total = CARDS.length;
+  if (visibleCount === total && filterStatus === "all") {
+    el.textContent = "";
+    return;
+  }
+  el.textContent = `Showing ${visibleCount} of ${total} expensive cards`;
+}
+
+function loadOwned() { return progressMap; }
+
+function setSyncNote(msg, color) {
+  const el = document.getElementById("sync-note");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.style.color = color || "#777";
+}
+
+function canSaveProgressFiles() {
+  const h = location.hostname;
+  return h === "127.0.0.1" || h === "localhost";
+}
+
+function envHint() {
+  if (canSaveProgressFiles()) {
+    setSyncNote(
+      "Local server: clicks save to progress/expensive.json. Commit and push so GitHub Pages picks up changes.",
+      "#f0c040"
+    );
+  } else if (location.protocol === "file:") {
+    setSyncNote(
+      "Opened as a file: the browser cannot write into progress/expensive.json. Run npm run local and open http://127.0.0.1:8765/expensive.html to save changes you can commit.",
+      "#ffb74d"
+    );
+  } else {
+    setSyncNote(
+      "Published copy: data comes from progress/expensive.json in the repo. You can click cards to preview in this tab only \u2014 refresh restores the site; nothing here changes Git or your files.",
+      "#888"
+    );
+  }
+}
+
+async function pullProgress() {
+  progressMap = await PokeProgress.loadListProgress(LIST_ID);
+}
+
+async function persistProgress() {
+  if (!canSaveProgressFiles()) return;
+  const ok = await PokeProgress.saveListProgress(LIST_ID, progressMap);
+  if (ok) {
+    setSyncNote("Saved to progress/expensive.json \u2014 commit and push when you are ready.", "#81c784");
+  } else {
+    setSyncNote("Could not write the file. Start the local server: npm run local \u2014 then open http://127.0.0.1:8765/expensive.html", "#ffb74d");
+  }
+}
+
+function updateCount() {
+  const c = PokeProgress.countFromMap(progressMap, CARDS.length);
+  document.getElementById("count-owned").textContent = c.owned;
+  document.getElementById("count-total").textContent = c.total;
+  const det = document.getElementById("stats-detail");
+  if (det) {
+    det.innerHTML =
+      "<b>Owned:</b> " + c.owned +
+      " &nbsp;|&nbsp; <b>On the way:</b> " + c.ontheway +
+      " &nbsp;|&nbsp; <b>Not yet:</b> " + c.missing;
+  }
+
+  let totalUsd = 0;
+  let missingUsd = 0;
+  for (const card of CARDS) {
+    const state = getCardState(card, progressMap);
+    totalUsd += card.priceUsd || 0;
+    if (state === "missing") missingUsd += card.priceUsd || 0;
+  }
+  const tv = document.getElementById("total-value");
+  if (tv) {
+    tv.innerHTML =
+      "Total list value: <b>" + formatUsd(totalUsd) + "</b> &nbsp;&middot;&nbsp; <b>" +
+      formatCzk(totalUsd) + "</b> &nbsp;&middot;&nbsp; <b>" + formatEur(totalUsd) + "</b>" +
+      "<br>Remaining to buy: <b>" + formatUsd(missingUsd) + "</b> &nbsp;&middot;&nbsp; <b>" +
+      formatCzk(missingUsd) + "</b> &nbsp;&middot;&nbsp; <b>" + formatEur(missingUsd) + "</b>";
+  }
+}
+
+function render() {
+  const owned = loadOwned();
+  const container = document.getElementById("card-list");
+  const visible = sortedCards(CARDS.filter((c) => cardMatchesFilters(c, owned)));
+
+  updateFilterHint(visible.length);
+
+  let html = "";
+  for (const c of visible) {
+    const cid = cardId(c);
+    const state = owned[cid] === true ? "owned" : (owned[cid] || "");
+    const cardClass = state === "owned" ? "owned" : state === "ontheway" ? "ontheway" : "";
+    const badgeText = state === "owned" ? "OWNED" : state === "ontheway" ? "ON THE WAY" : "";
+    const btnClass = state === "owned" ? "owned" : state === "ontheway" ? "ontheway" : "";
+    const btnText = state === "owned" ? "&#10003; Owned" : state === "ontheway" ? "&#128230; On the way" : "&#9744; Don't have yet";
+    const dn = c.displayNum || (c.setTotal ? `${parseInt(c.number,10)} / ${c.setTotal}` : `#${parseInt(c.number,10)}`);
+    const hpStr = c.hp ? `<span><b>HP:</b> ${c.hp}</span>` : "";
+    const weakStr = c.weakness && c.weakness !== "None" ? `<span><b>Weak:</b> ${c.weakness}</span>` : "";
+    const tcgStr = c.priceTcgUsd ? `<b>TCGPlayer:</b><span class="price-cell">${formatUsd(c.priceTcgUsd)}</span>` : "";
+    html += `
+      <div class="card ${cardClass}" id="card-${cid}">
+        <div class="price-tag" title="Ungraded raw market price">${formatUsd(c.priceUsd)}</div>
+        <div class="status-badge">${badgeText}</div>
+        <div class="card-img-wrap">
+          <img src="${getImgUrl(c)}" alt="${c.name}" loading="lazy"
+               onerror="this.onerror=null;this.alt='Image not available';">
+        </div>
+        <div class="card-info">
+          <div class="card-name">${c.name}</div>
+          <div class="card-meta">
+            <span><b>Set:</b> ${c.set}</span>
+            <span><b>#</b> ${dn}</span>
+            ${hpStr}
+          </div>
+          <div class="card-meta">
+            <span class="type-badge type-${c.type.toLowerCase()}">${c.type}</span>
+            <span class="rarity-badge rarity-${c.rarityClass}">${c.rarity}</span>
+            ${weakStr}
+          </div>
+          <div class="price-row">
+            <b>Ungraded (raw):</b><span class="price-cell">${formatUsd(c.priceUsd)}</span>
+            <b>In K\u010d:</b><span class="price-cell">${formatCzk(c.priceUsd)}</span>
+            <b>In EUR:</b><span class="price-cell">${formatEur(c.priceUsd)}</span>
+            ${tcgStr}
+            <div class="price-links">
+              <a href="${c.pricechartingUrl}" target="_blank" rel="noopener noreferrer">PriceCharting</a>
+              <a href="${c.tcgplayerUrl}" target="_blank" rel="noopener noreferrer">TCGPlayer</a>
+            </div>
+          </div>
+          <div class="status-row">
+            <button class="status-btn ${btnClass}" onclick="cycleState('${cid}')">${btnText}</button>
+          </div>
+        </div>
+      </div>`;
+  }
+  if (!html) {
+    html =
+      '<p class="filter-empty">No cards match this status. Try clicking <b>All</b> above.</p>';
+  }
+  container.innerHTML = html;
+  updateCount();
+}
+
+function initFilters() {
+  updateStatusSegmentUI();
+
+  const seg = document.getElementById("status-seg");
+  if (seg) {
+    seg.querySelectorAll(".seg-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        filterStatus = btn.dataset.status || "all";
+        updateStatusSegmentUI();
+        render();
+      });
+    });
+  }
+
+  const sortSel = document.getElementById("filter-sort");
+  if (sortSel) {
+    sortSel.value = sortMode;
+    sortSel.addEventListener("change", () => {
+      sortMode = sortSel.value || "price-desc";
+      render();
+    });
+  }
+}
+
+async function cycleState(cid) {
+  const owned = loadOwned();
+  const cur = owned[cid] === true ? "owned" : (owned[cid] || "");
+  const next = cur === "" ? "ontheway" : cur === "ontheway" ? "owned" : "";
+  if (next) owned[cid] = next; else delete owned[cid];
+  if (canSaveProgressFiles()) await persistProgress();
+
+  const el = document.getElementById(`card-${cid}`);
+  if (!el) return;
+  el.classList.remove("owned", "ontheway");
+  if (next) el.classList.add(next);
+
+  const badge = el.querySelector(".status-badge");
+  badge.textContent = next === "owned" ? "OWNED" : next === "ontheway" ? "ON THE WAY" : "";
+  badge.style.display = next ? "block" : "none";
+
+  const btn = el.querySelector(".status-btn");
+  btn.className = "status-btn" + (next ? " " + next : "");
+  btn.innerHTML = next === "owned" ? "&#10003; Owned" : next === "ontheway" ? "&#128230; On the way" : "&#9744; Don't have yet";
+
+  updateCount();
+
+  if (filterStatus !== "all") render();
+}
+
+document.getElementById("date-str").textContent = new Date().toLocaleDateString("en-US", {
+  year: "numeric", month: "long", day: "numeric"
+});
+
+(async function boot() {
+  await pullProgress();
+  envHint();
+  initFilters();
+  render();
+})();
+</script>
+</div>
+
+<script>
+const HASH = "cdb1b5a8f8ddb270135b9d7b27cdf57e5e346d92b53d2bdc595a50b26029ab32";
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(msg));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
+async function unlock() {
+  const pw = document.getElementById("lock-pw").value;
+  if ((await sha256(pw)) === HASH) {
+    sessionStorage.setItem("poke-auth", "1");
+    document.getElementById("lock-screen").classList.add("hidden");
+    document.getElementById("app-content").style.display = "";
+  } else {
+    document.getElementById("lock-err").textContent = "Wrong password";
+  }
+}
+if (sessionStorage.getItem("poke-auth") === "1") {
+  document.getElementById("lock-screen").classList.add("hidden");
+  document.getElementById("app-content").style.display = "";
+}
+document.getElementById("lock-btn").addEventListener("click", unlock);
+document.getElementById("lock-pw").addEventListener("keydown", e => { if (e.key === "Enter") unlock(); });
+</script>
+</body>
+</html>

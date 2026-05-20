@@ -11,7 +11,7 @@
     {
       "id": "wishlist",
       "title": "Wishlist",
-      "total": 111,
+      "total": 103,
       "progressFile": "progress/wishlist.json",
       "page": "wishlist.html",
       "accent": "wishlist"
@@ -23,6 +23,14 @@
       "progressFile": "progress/cosmosholos.json",
       "page": "cosmos-holos.html",
       "accent": "cosmosholos"
+    },
+    {
+      "id": "expensive",
+      "title": "Expensive Cards",
+      "total": 8,
+      "progressFile": "progress/expensive.json",
+      "page": "expensive.html",
+      "accent": "expensive"
     }
   ]
 }

@@ -167,6 +167,48 @@
     margin-top: 6px;
   }
 
+  .all-cards-cta {
+    max-width: 700px;
+    margin: 0 auto 28px;
+    text-align: center;
+  }
+
+  .all-cards-cta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7ec8e3, #e8a0e8 45%, #9c7cf4 75%, #f0c040);
+    color: #16213e;
+    font-size: 17px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform .15s, box-shadow .2s, filter .15s;
+    border: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 4px 18px rgba(126,200,227,.18);
+  }
+
+  .all-cards-cta a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(232,160,232,.28);
+    filter: brightness(1.05);
+  }
+
+  .all-cards-cta .cta-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .all-cards-cta .cta-sub {
+    display: block;
+    max-width: 520px;
+    margin: 10px auto 0;
+    font-size: 12px;
+    color: #888;
+    line-height: 1.4;
+  }
+
   .lists-grid {
     max-width: 700px;
     margin: 0 auto;
@@ -328,6 +370,15 @@
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+    .all-cards-cta a {
+      color: #000;
+      background: #e8eef5;
+      border: 1px solid #333;
+      box-shadow: none;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .all-cards-cta .cta-sub { color: #555; }
     .total-section, .list-card { background: #fff; border: 1.5px solid #000; }
     .total-section h2 { color: #333; }
     .stat-number { color: #000; }
@@ -412,6 +463,14 @@
     <div class="progress-bar-fill" id="total-bar" style="width:0;background:linear-gradient(90deg,#4caf50,#7ec8e3)"></div>
   </div>
   <div class="progress-pct" id="total-pct">0%</div>
+</div>
+
+<div class="all-cards-cta">
+  <a href="all-cards.html">
+    <span class="cta-icon">&#127183;</span>
+    <span>All Cards</span>
+  </a>
+  <span class="cta-sub">Every card from every list on a single page, sortable by set or by list.</span>
 </div>
 
 <div class="lists-grid">

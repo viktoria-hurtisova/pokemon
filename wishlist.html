@@ -404,6 +404,7 @@
   .type-metal     { background: #78909c; }
   .type-colorless { background: #78909c; }
   .type-trainer   { background: #607d8b; }
+  .type-fairy     { background: #ec4899; }
 
   .status-row {
     margin-top: auto;
@@ -700,7 +701,33 @@ const CARDS = [
   // ---- Lost Origin (h25) ----
   { name: "Cook", number: "h25", setTotal: null, set: "Lost Origin", setSlug: "lostorigin", rarity: "Trainer Gallery", rarityClass: "ir", type: "Trainer", hp: null, weakness: null, retreat: null, displayNum: "SH25" },
   // ---- Perfect Order (101) ----
-  { name: "Salazzle ex", number: "101", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Illustration Rare", rarityClass: "ir", type: "Fire", hp: 260, weakness: "Water", retreat: 1 }
+  { name: "Salazzle ex", number: "101", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Illustration Rare", rarityClass: "ir", type: "Fire", hp: 260, weakness: "Water", retreat: 1 },
+  // ---- Destined Rivals (197) ----
+  { name: "Rotom", number: "197", setTotal: "182", set: "Destined Rivals", setSlug: "destinedrivals", rarity: "Illustration Rare", rarityClass: "ir", type: "Electric", hp: 60, weakness: "Fighting", retreat: 1 },
+  // ---- Black Bolt (092) ----
+  { name: "Lilligant", number: "092", setTotal: "86", set: "Black Bolt", setSlug: "blackbolt", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 100, weakness: "Fire", retreat: 1 },
+  // ---- Brilliant Stars (h14) ----
+  { name: "Sylveon V", number: "h14", setTotal: null, set: "Brilliant Stars", setSlug: "brilliantstars", rarity: "Trainer Gallery", rarityClass: "ur", type: "Psychic", hp: 200, weakness: "Metal", retreat: 1, displayNum: "SH14" },
+  // ---- Paradox Rift (258) ----
+  { name: "Rika", number: "258", setTotal: "182", set: "Paradox Rift", setSlug: "paradoxrift", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  // ---- Scarlet Violet (251) ----
+  { name: "Miriam", number: "251", setTotal: "198", set: "Scarlet Violet", setSlug: "scarletviolet", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  // ---- Shrouded Fable (094) ----
+  { name: "Cassiopeia", number: "094", setTotal: "64", set: "Shrouded Fable", setSlug: "shroudedfable", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  // ---- Silver Tempest (173) ----
+  { name: "Alolan Vulpix V", number: "173", setTotal: "195", set: "Silver Tempest", setSlug: "silvertempest", rarity: "Ultra Rare", rarityClass: "ur", type: "Water", hp: 190, weakness: "Metal", retreat: 1 },
+  // ---- Ascended Heroes (242) ----
+  { name: "Carbink", number: "242", setTotal: "217", set: "Ascended Heroes", setSlug: "ascendedheroes", rarity: "Illustration Rare", rarityClass: "ir", type: "Fighting", hp: 90, weakness: "Grass", retreat: 1 },
+  // ---- Generations (h19) — holo variant ----
+  { name: "Swirlix", number: "h19", setTotal: null, set: "Generations", setSlug: "generations", rarity: "Holo Rare", rarityClass: "holo", type: "Fairy", hp: 60, weakness: "Metal", retreat: 1, displayNum: "RC19" },
+  // ---- Paldea Evolved (258) ----
+  { name: "Skeledirge ex", number: "258", setTotal: "198", set: "Paldea Evolved", setSlug: "paldeaevolved", rarity: "Special Art Rare", rarityClass: "sar", type: "Fire", hp: 340, weakness: "Water", retreat: 3 },
+  // ---- Temporal Forces (180) ----
+  { name: "Lickitung", number: "180", setTotal: "162", set: "Temporal Forces", setSlug: "temporalforces", rarity: "Illustration Rare", rarityClass: "ir", type: "Colorless", hp: 100, weakness: "Fighting", retreat: 3 },
+  // ---- Pokemon Card 151 (178) ----
+  { name: "Tangela", number: "178", setTotal: "165", set: "Pokemon Card 151", setSlug: "151", rarity: "Illustration Rare", rarityClass: "ir", type: "Grass", hp: 80, weakness: "Fire", retreat: 2 },
+  // ---- Paradox Rift (253) ----
+  { name: "Altaria ex", number: "253", setTotal: "182", set: "Paradox Rift", setSlug: "paradoxrift", rarity: "Special Art Rare", rarityClass: "sar", type: "Dragon", hp: 260, weakness: "None", retreat: 1 }
 ];
 
 function getImgUrl(c) {

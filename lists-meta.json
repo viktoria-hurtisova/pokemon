@@ -11,7 +11,7 @@
     {
       "id": "wishlist",
       "title": "Wishlist",
-      "total": 103,
+      "total": 115,
       "progressFile": "progress/wishlist.json",
       "page": "wishlist.html",
       "accent": "wishlist"
@@ -19,7 +19,7 @@
     {
       "id": "cosmosholos",
       "title": "Cosmos Holos",
-      "total": 9,
+      "total": 20,
       "progressFile": "progress/cosmosholos.json",
       "page": "cosmos-holos.html",
       "accent": "cosmosholos"

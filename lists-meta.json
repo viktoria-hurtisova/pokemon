@@ -11,7 +11,7 @@
     {
       "id": "wishlist",
       "title": "Wishlist",
-      "total": 115,
+      "total": 126,
       "progressFile": "progress/wishlist.json",
       "page": "wishlist.html",
       "accent": "wishlist"

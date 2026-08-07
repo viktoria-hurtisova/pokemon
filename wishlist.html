@@ -611,12 +611,13 @@ const CARDS = [
   { name: "Vanillite", number: "111", setTotal: "86", set: "White Flare", setSlug: "whiteflare", rarity: "Illustration Rare", rarityClass: "ir", type: "Water", hp: 60, weakness: "Metal", retreat: 1 },
   { name: "Vanilluxe", number: "113", setTotal: "86", set: "White Flare", setSlug: "whiteflare", rarity: "Illustration Rare", rarityClass: "ir", type: "Water", hp: 150, weakness: "Metal", retreat: 2 },
   { name: "Joltik", number: "116", setTotal: "86", set: "White Flare", setSlug: "whiteflare", rarity: "Illustration Rare", rarityClass: "ir", type: "Electric", hp: 40, weakness: "Fighting", retreat: 1 },
-  // ---- Perfect Order (102, 113, 117, 119, 122) ----
+  // ---- Perfect Order (102, 113, 117, 119, 122, 123) ----
   { name: "Mega Starmie ex", number: "102", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Illustration Rare", rarityClass: "ir", type: "Water", hp: 330, weakness: "Electric", retreat: 2 },
   { name: "Poke Pad", number: "113", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Illustration Rare", rarityClass: "ir", type: "Trainer", hp: null, weakness: null, retreat: null },
   { name: "Wondrous Patch", number: "117", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Illustration Rare", rarityClass: "ir", type: "Trainer", hp: null, weakness: null, retreat: null },
   { name: "Mega Clefable ex", number: "119", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 320, weakness: "Metal", retreat: 1 },
   { name: "Jacinthe", number: "122", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
+  { name: "Rosa's Encouragement", number: "123", setTotal: "88", set: "Perfect Order", setSlug: "perfectorder", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null },
   // ---- Mega Dream ex (230) ----
   { name: "Mega Gengar ex", number: "230", setTotal: "193", set: "Mega Dream ex", setSlug: "megadreamex", rarity: "Ultra Rare", rarityClass: "ur", type: "Darkness", hp: 350, weakness: "Fighting", retreat: 2 },
   // ---- Mega Evolution (133, 134, 172) ----
@@ -702,7 +703,21 @@ const CARDS = [
   // ---- Shining Fates (h12, h13, h14) ----
   { name: "Applin", number: "h12", setTotal: null, set: "Shining Fates", setSlug: "shiningfates", rarity: "Shiny Vault", rarityClass: "holo", type: "Grass", hp: 40, weakness: "Fire", retreat: 1, displayNum: "SH12" },
   { name: "Flapple", number: "h13", setTotal: null, set: "Shining Fates", setSlug: "shiningfates", rarity: "Shiny Vault", rarityClass: "holo", type: "Grass", hp: 80, weakness: "Fire", retreat: 1, displayNum: "SH13" },
-  { name: "Appletun", number: "h14", setTotal: null, set: "Shining Fates", setSlug: "shiningfates", rarity: "Shiny Vault", rarityClass: "holo", type: "Grass", hp: 90, weakness: "Fire", retreat: 3, displayNum: "SH14" }
+  { name: "Appletun", number: "h14", setTotal: null, set: "Shining Fates", setSlug: "shiningfates", rarity: "Shiny Vault", rarityClass: "holo", type: "Grass", hp: 90, weakness: "Fire", retreat: 3, displayNum: "SH14" },
+  // ---- SV Promos (170, 171, 172) ----
+  { name: "Leafeon", number: "170", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Grass", hp: 120, weakness: "Fire", retreat: 1 },
+  { name: "Glaceon", number: "171", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Water", hp: 120, weakness: "Metal", retreat: 1 },
+  { name: "Sylveon", number: "172", setTotal: null, set: "SV Promos", setSlug: "svpromos", rarity: "Promo", rarityClass: "promo", type: "Psychic", hp: 120, weakness: "Metal", retreat: 1 },
+  // ---- Chaos Rising (092) ----
+  { name: "Claydol", number: "092", setTotal: "86", set: "Chaos Rising", setSlug: "chaosrising", rarity: "Illustration Rare", rarityClass: "ir", type: "Fighting", hp: 120, weakness: "Grass", retreat: 2 },
+  // ---- Paradox Rift (216) ----
+  { name: "Iron Jugulis", number: "216", setTotal: "182", set: "Paradox Rift", setSlug: "paradoxrift", rarity: "Illustration Rare", rarityClass: "ir", type: "Colorless", hp: 130, weakness: "Electric", retreat: 2 },
+  // ---- Pitch Black (038, 102, 111, 115, 119) ----
+  { name: "Mega Chandelure ex", number: "038", setTotal: "84", set: "Pitch Black", setSlug: "pitchblack", rarity: "Double Rare", rarityClass: "dr", type: "Psychic", hp: 350, weakness: "Darkness", retreat: 2 },
+  { name: "Morpeko ex", number: "102", setTotal: "84", set: "Pitch Black", setSlug: "pitchblack", rarity: "Illustration Rare", rarityClass: "ir", type: "Darkness", hp: 180, weakness: "Grass", retreat: 1 },
+  { name: "Misty's Vitality", number: "111", setTotal: "84", set: "Pitch Black", setSlug: "pitchblack", rarity: "Illustration Rare", rarityClass: "ir", type: "Trainer", hp: null, weakness: null, retreat: null },
+  { name: "Mega Chandelure ex", number: "115", setTotal: "84", set: "Pitch Black", setSlug: "pitchblack", rarity: "Special Art Rare", rarityClass: "sar", type: "Psychic", hp: 350, weakness: "Darkness", retreat: 2 },
+  { name: "Gwynn", number: "119", setTotal: "84", set: "Pitch Black", setSlug: "pitchblack", rarity: "Special Art Rare", rarityClass: "sar", type: "Trainer", hp: null, weakness: null, retreat: null }
 ];
 
 function getImgUrl(c) {
